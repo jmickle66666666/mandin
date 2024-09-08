@@ -1,7 +1,11 @@
 (function() {
     let TilePicker = {};
 
-    TilePicker.currentTile = -1;
+    TilePicker.currentTiles = [];
+    TilePicker.getCurrentTile = function () {
+        if (TilePicker.currentTiles.length == 0) return -1;
+        return TilePicker.currentTiles[Math.floor(Math.random() * TilePicker.currentTiles.length)];
+    }
 
     let open = false;
     function openWindow() {
@@ -56,10 +60,21 @@
                             let tx = tileIndex % tiles_per_row;
                             let ty = Math.floor(tileIndex / tiles_per_row);
 
-                            TilePicker.currentTile = tileIndex;
+                            if (e.shiftKey) {
+                                if (TilePicker.currentTiles.indexOf(tileIndex) == -1) {
+                                    TilePicker.currentTiles.push(tileIndex);
+                                    hctx.fillRect(tx, ty, 1, 1);
+                                } else {
+                                    TilePicker.currentTiles.splice(TilePicker.currentTiles.indexOf(tileIndex), 1);
+                                    hctx.clearRect(tx, ty, 1, 1);
+                                }
+                            } else {
+                                TilePicker.currentTiles = [tileIndex];
+                                hctx.clearRect(0, 0, tiles_per_row, tiles_per_column);
+                                hctx.fillRect(tx, ty, 1, 1);
+                            }
                             
-                            hctx.clearRect(0, 0, tiles_per_row, tiles_per_column);
-                            hctx.fillRect(tx, ty, 1, 1);
+                            
                         });
                     });
                 });

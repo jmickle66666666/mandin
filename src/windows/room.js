@@ -211,8 +211,10 @@
         let y = Math.floor((my / 8)/zoom);
         let index = x + y * Layers.currentLayer.tiles.SerialiseWidth;
         index += 1;
-        Layers.currentLayer.tiles["TileCompressedData"][index] = TilePicker.currentTile;
-
+        let newTile = TilePicker.getCurrentTile();
+        if (newTile != -1) {
+            Layers.currentLayer.tiles["TileCompressedData"][index] = newTile;
+        }
 
         for (let i = 0; i < roomLayers.length; i++) {
             if (roomLayers[i].layer == Layers.currentLayer) {
