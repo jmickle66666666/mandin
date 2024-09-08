@@ -214,12 +214,12 @@
         let newTile = TilePicker.getCurrentTile();
         if (newTile != -1) {
             Layers.currentLayer.tiles["TileCompressedData"][index] = newTile;
-        }
-
-        for (let i = 0; i < roomLayers.length; i++) {
-            if (roomLayers[i].layer == Layers.currentLayer) {
-                updateTileLayer(roomLayers[i].getContext("2d"), Layers.currentLayer);
-                break;
+            
+            for (let i = 0; i < roomLayers.length; i++) {
+                if (roomLayers[i].layer == Layers.currentLayer) {
+                    drawTile(roomLayers[i].tileset_image, roomLayers[i].getContext("2d"), newTile, x, y, tilesetData.tileWidth, tilesetData.tileHeight);
+                    break;
+                }
             }
         }
     }
