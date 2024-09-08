@@ -1,11 +1,13 @@
-window.onload = () => {
+Engine.setIcon("assets/icon.png");
 
+window.onload = () => {
+    
+    Engine.setTitle("GMRoomEdit");
     Engine.fileReadText("project.cfg", (data) => {
         GMF.setProjectPath(data);
         // GMF.listObjects();
     });
 
-    Engine.setTitle("GMRoomEdit");
 
     setTimeout(() => { ObjectPicker.openWindow(); }, 50 + Math.random() * 200);
     setTimeout(() => { RoomPicker.openWindow(); }, 50 + Math.random() * 200);
