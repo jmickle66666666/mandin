@@ -1,0 +1,201 @@
+:root {
+    --main-color: #77aa33;
+}
+
+* {
+    font-family: "FixederSys", monospace;
+    
+    user-select: none;
+}
+
+body {
+    margin: 0px;
+    font-family: "FixederSys", monospace;
+    background-color: #112211;
+}
+
+windows {
+    display:none;
+}
+
+div.menubar {
+    margin: 0px;
+    background-color: var(--main-color);
+}
+
+button {
+    margin: 0px;
+    border:none;
+    font-size: 1em;
+    background-color: var(--main-color);
+    height:32px;
+}
+
+button:hover {
+    background-color: white;
+}
+
+@font-face {
+    font-family: "FixederSys";
+    src: url("FixederSys1x.ttf");
+}
+
+.winbox {
+    background: var(--main-color);
+    box-shadow: none;
+    border: 1px solid black;
+}
+
+.wb-title {
+    color: black;
+    font-family: "FixederSys", monospace;
+    font-size: 1em;
+}
+
+.wb-control {
+    filter:invert();
+}
+
+input[type="radio"] {
+    appearance: none;
+    background-color: #112211;
+    width:16px;
+    height:16px;
+    margin: 0px;
+}
+
+input[type="radio"]:checked {
+    background-color: #555;
+}
+
+input[type="radio"]:hover {
+    background-color: #888888;
+}
+
+.listOption {
+    height: 24px;
+    display: flex;
+    align-items: center;
+    width:100%;
+    background-color: #112211;
+    color: #bbb;
+    user-select: none;
+}
+.listOption[selected="true"] {
+    background-color: #444;
+    color:white;
+}
+
+.listOption:hover {
+    background-color: #888888;
+}
+
+.listOption img {
+    height: 24px;
+    image-rendering: pixelated;
+    max-width: 24px;
+}
+
+
+.wb-body {
+    background-color: #112211;
+}
+
+input.pickerfilter {
+    width:100%;
+    border:none;
+    background-color: #000;
+    height:32px;
+    flex-shrink: 0;
+    color:white;
+    font-size: 1em;
+}
+
+div.picker {
+    display:flex;
+    flex-direction: column;
+    height:100%;
+    overflow-y:hidden;
+}
+
+div.pickerlist {
+    overflow-y: auto;
+    height:100%;
+}
+
+#log {
+    background-color: #000;
+    height:100%;
+    display:flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.logmessage {
+    color:white;
+    display:flex;
+    align-items: flex-start;
+}
+
+.logtimestamp {
+    color:#777;
+    padding-right: 8px;
+}
+
+.logmessage img {
+    filter:scale(3);
+    image-rendering: pixelated;
+}
+
+.wb-body:has(#roomViewer) {
+    overflow: hidden;
+    display:flex;
+}
+
+#roomViewer {
+    flex-grow: 1;
+}
+
+#roomViewer canvas {
+    image-rendering: pixelated;
+}
+
+#tilePicker {
+    display:flex;
+}
+
+#tilePicker img {
+    image-rendering: pixelated;
+    height: 100%;
+    max-width: 100%;
+    flex-grow:1;
+    user-select: none;
+}
+
+#tilePicker canvas {
+    position:absolute;
+    image-rendering: pixelated;
+    width: 100%;
+    pointer-events: none;
+}
+
+img { 
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    -ms-user-drag: none;
+    user-drag: none;
+}
+
+#layerlist .listOption button {
+    height:24px;
+    width: 24px;
+}

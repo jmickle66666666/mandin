@@ -1,0 +1,52 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<div class="menubar">
+    <button>FILE</button><button>OPTIONS</button><button id="btn_rooms">ROOMS</button><button id="btn_objects">OBJECTS</button><button id="btn_log">LOG</button>
+</div>
+
+<body>
+    <windows>
+        
+        <div class="wb picker" id="objectpicker">
+            <input type="text" id="objectpickerfilter" class="pickerfilter">
+            <div id="objectpickerlist" class="pickerlist"></div>
+        </div>
+
+        <div class="wb picker" id="roompicker">
+            <input type="text" id="roompickerfilter" class="pickerfilter">
+            <div id="roompickerlist" class="pickerlist"></div>
+            <button id="btn_roompickerload">load it</button>
+        </div>
+
+        <div class="wb picker" id="layers">
+            <div id="layerlist" class="pickerlist"></div>
+        </div>
+
+        <div class="wb" id="roomViewer">
+        </div>
+
+        <div class="wb" id="tilePicker">
+        </div>
+
+        <div class="wb" id="log">
+        </div>
+
+    </windows>
+    
+    <script src="winbox.bundle.min.js"></script>
+    <script src="engine.js"></script>
+    
+    <script src="util.js"></script>
+    <script src="log.js"></script>
+    <script src="room.js"></script>
+    <script src="tilepicker.js"></script>
+    <script src="objectpicker.js"></script>
+    <script src="roompicker.js"></script>
+    <script src="layers.js"></script>
+    <script src="gmfiles.js"></script>
+    
+    <script src="main.js"></script>
+</body>
+
