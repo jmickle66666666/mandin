@@ -50,9 +50,9 @@
                 }
             }
 
-            if (layers[i]["$GMRInstanceLayer"] != null) { option.insertBefore(Util.img("img/instances.png"), option.firstChild); }
-            if (layers[i]["$GMRTileLayer"] != null) { option.insertBefore(Util.img("img/tiles.png"), option.firstChild); }
-            if (layers[i]["$GMRBackgroundLayer"] != null) { option.insertBefore(Util.img("img/bg.png"), option.firstChild); }
+            if (layers[i]["$GMRInstanceLayer"] != null) { option.insertBefore(Util.img("assets/instances.png"), option.firstChild); }
+            if (layers[i]["$GMRTileLayer"] != null) { option.insertBefore(Util.img("assets/tiles.png"), option.firstChild); }
+            if (layers[i]["$GMRBackgroundLayer"] != null) { option.insertBefore(Util.img("assets/bg.png"), option.firstChild); }
 
             let visibutton = document.createElement("button");
             visibutton.innerText = layers[i].visible==true?"O":"-";
