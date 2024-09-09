@@ -229,8 +229,8 @@
     });
 
     function paintTile() {
-        let x = Math.floor((mx / 8)/zoom);
-        let y = Math.floor((my / 8)/zoom);
+        let x = Math.floor(((mx-dx*zoom) / tilesetData.tileWidth)/zoom);
+        let y = Math.floor(((my-dy*zoom) / tilesetData.tileHeight)/zoom);
         let index = x + y * Layers.currentLayer.tiles.SerialiseWidth;
         index += 1;
         let newTile = TilePicker.getCurrentTile();
