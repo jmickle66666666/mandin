@@ -84,6 +84,11 @@
                 });
             }
         }
+
+        if (layer["$GMRBackgroundLayer"] != null) {
+            ctx.fillStyle = Util.abgrToRGBA(layer.colour);
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        }
     }
 
     function updateTileLayer(ctx, layer) {
