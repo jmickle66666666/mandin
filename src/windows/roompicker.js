@@ -93,6 +93,7 @@
     document.querySelector("#roompickerfilter").addEventListener("input", () => {
         buildList(cachedRooms, document.querySelector("#roompickerfilter").value);
     })
+    document.querySelector("#roompickerlist").addEventListener("dblclick", loadRoom);
     document.querySelector("#btn_rooms").addEventListener("click", openWindow);
     document.querySelector("#btn_roompickerload").addEventListener("click", loadRoom);
 
