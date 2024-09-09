@@ -5,6 +5,8 @@
     let roomPath = null;
     let tilesetData = null;
 
+    let rv = document.querySelector("div.wb#roomViewer");
+
     let roomLayers = [];
 
     function drawTile(src, dest, index, x, y, tileWidth, tileHeight)
@@ -138,7 +140,7 @@
         canvas.width = roomData.roomSettings.Width;
         canvas.height = roomData.roomSettings.Height;
 
-        document.querySelector("div.wb#roomViewer").innerHTML = "";
+        rv.innerHTML = "";
         roomLayers = [];
         for (let i = 0; i < layers.length; i++)
         {
@@ -157,7 +159,7 @@
         
         for (let i = 0; i < roomLayers.length; i++)
         {
-            document.querySelector("div.wb#roomViewer").appendChild(roomLayers[i]);
+            rv.appendChild(roomLayers[i]);
         }
 
         openWindow(canvas.width, canvas.height);
@@ -200,7 +202,7 @@
     let mx = 0;
     let my = 0;
     let holding = false;
-    document.querySelector("div.wb#roomViewer").addEventListener("mousedown", (e) => {
+    rv.addEventListener("mousedown", (e) => {
         if (e.button == 1) {
             dragging = true;
         }
@@ -280,46 +282,25 @@
                 paintTile();
             }
         }
+    });
 
-        mx = e.offsetX;
-        my = e.offsetY;
+    rv.addEventListener("mousemove", (e) => {
+        let r = rv.getBoundingClientRect();
+        mx = e.pageX - r.x;
+        my = e.pageY - r.y;
     });
 
     let zoom = 1.0;
-    document.querySelector("div.wb#roomViewer").addEventListener("wheel", (e) => {
-        // moveView((-mx/2) * zoom, (-my/2) * zoom);
-
-        // let w = document.querySelector("div.wb#roomViewer").getBoundingClientRect().width;
-        // let h = document.querySelector("div.wb#roomViewer").getBoundingClientRect().height;
-
-        // let oldx = (e.offsetX - dx) / w;
-        // let oldy = (e.offsetY - dy) / h;
-
+    rv.addEventListener("wheel", (e) => {
         let oldZoom = zoom;
-        if (e.deltaY < 0) zoom *= 1.1;
-        if (e.deltaY > 0) zoom /= 1.1;
+        if (e.deltaY < 0) zoom *= 1.2;
+        if (e.deltaY > 0) zoom /= 1.2;
 
-        // dx = e.offsetX - w * zoom * oldx;
-        // dy = e.offsetY - h * zoom * oldy;
-        // moveViewTo(dx, dy);
+        let zoomDiff = zoom-oldZoom;
 
-        // log(`${e.offsetX}, ${e.offsetY}`);
-        // log(`${e.offsetX/oldZoom}, ${e.offsetY/oldZoom}`);
-        // log(`${e.offsetX/zoom}, ${e.offsetY/zoom}`);
+        moveView((-mx/oldZoom) * zoomDiff, (-my/oldZoom) * zoomDiff);
 
-        let dx = (e.offsetX/oldZoom) - (e.offsetX/zoom);
-        let dy = (e.offsetY/oldZoom) - (e.offsetY/zoom);
-        moveView(-dx, -dy);
-
-        // let nx = e.offsetX/zoom - (e.offsetX/zoom - dx) * (zoom/oldZoom);
-        // let ny = e.offsetY/zoom - (e.offsetY/zoom - dy) * (zoom/oldZoom);
-        // moveViewTo(nx, ny);
-        
-
-        // let zoomDiff = zoom - oldZoom;
-        // moveView(-mx * zoomDiff, -my * zoomDiff);
-        // moveView(-dx / zoom, -dy / zoom);
-        document.querySelector("div.wb#roomViewer").style.zoom = `${zoom*100}%`;
+        rv.style.zoom = `${zoom*100}%`;
     });
 
     window.Room = Room;
