@@ -13,7 +13,9 @@ window.onload = () => {
         if (Settings.getWindowOpen("log")) setTimeout(() => { openLog(); }, 50 + Math.random() * 200);
 
         let windowSize = Settings.getWindowSize("window", -1, -1, 800, 600);
-        Engine.setSize(Math.floor(windowSize.w), Math.floor(windowSize.h));
+        if (window.visualViewport.width != windowSize.w || window.visualViewport.height != windowSize.h) {
+            Engine.setSize(Math.floor(windowSize.w), Math.floor(windowSize.h));
+        }
     });
 
 
