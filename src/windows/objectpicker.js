@@ -61,8 +61,8 @@
             }
 
             setTimeout(() => {
-                GMF.getObjectSprite(objects[i], (data) => {
-                    Util.loadImage(data, (data) => {
+                GMF.getObjectSprite(objects[i], (sprite_data) => {
+                    Util.loadImage(sprite_data.img_path, (data) => {
                         option.insertBefore(data, option.firstChild);
                     })
                 });

@@ -26,4 +26,8 @@ window.onload = () => {
             Math.floor(window.visualViewport.height)
         );
     });
+
+    window.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+    });
 }

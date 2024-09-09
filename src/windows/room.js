@@ -29,8 +29,8 @@
             let newTileArray = [layer.tiles.SerialiseWidth * layer.tiles.SerialiseHeight,];
             GMF.getAssetData(layer.tilesetId.name, (tileset_data) => {
                 tilesetData = tileset_data;
-                GMF.getObjectSprite(layer.tilesetId.name, (img_path) => {
-                    Util.loadImage(img_path, (tileset_image) => {
+                GMF.getObjectSprite(layer.tilesetId.name, (sprite_data) => {
+                    Util.loadImage(sprite_data.img_path, (tileset_image) => {
                         ctx.canvas.tileset_image = tileset_image;
                         let tiles = layer.tiles["TileCompressedData"];
 
@@ -75,11 +75,14 @@
         if (layer["$GMRInstanceLayer"] != null) {
             let instances = layer.instances;
             for (let inst of instances) {
-                GMF.getObjectSprite(inst.objectId.name, (imgpath) => {
-                    Util.loadImage(imgpath, (img) => {
-                        ctx.drawImage(img, inst.x, inst.y);
+                GMF.getObjectSprite(inst.objectId.name, (sprite_data) => {
+                    
+                    if (sprite_data.data.origin == 9) console.log(sprite_data.data);
+                    Util.loadImage(sprite_data.img_path, (img) => {
+                        ctx.drawImage(img, inst.x - sprite_data.data.sequence.xorigin, inst.y - sprite_data.data.sequence.yorigin);
                     })
                 });
+                log(inst);
             }
         }
     }

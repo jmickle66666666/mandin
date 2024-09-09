@@ -41,8 +41,8 @@
     let highlight = null;
     function loadTileset(tileset) {
         openWindow();
-        GMF.getObjectSprite(tileset, (img_path) => {
-            Util.loadImage(img_path, (img) => {
+        GMF.getObjectSprite(tileset, (sprite_data) => {
+            Util.loadImage(sprite_data.img_path, (img) => {
                 document.querySelector("div.wb#tilePicker").appendChild(img);
 
                 

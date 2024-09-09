@@ -1,5 +1,6 @@
 :root {
-    --main-color: #77aa33;
+    --main-color: #e2bd38;
+    --dark-color: #392616;
 }
 
 * {
@@ -11,7 +12,7 @@
 body {
     margin: 0px;
     font-family: "FixederSys", monospace;
-    background-color: #112211;
+    background-color: var(--dark-color);
 }
 
 windows {
@@ -20,14 +21,14 @@ windows {
 
 div.menubar {
     margin: 0px;
-    background-color: var(--main-color);
+    background: linear-gradient(0deg, #b47f26, var(--main-color));
 }
 
 button {
     margin: 0px;
     border:none;
     font-size: 1em;
-    background-color: var(--main-color);
+    background: linear-gradient(0deg, #b47f26, var(--main-color));
     height:32px;
 }
 
@@ -52,13 +53,17 @@ button:hover {
     font-size: 1em;
 }
 
+.wb-header {
+    background: linear-gradient(0deg, #b47f26, var(--main-color));
+}
+
 .wb-control {
     filter:invert();
 }
 
 input[type="radio"] {
     appearance: none;
-    background-color: #112211;
+    background-color: var(--dark-color);
     width:16px;
     height:16px;
     margin: 0px;
@@ -77,7 +82,7 @@ input[type="radio"]:hover {
     display: flex;
     align-items: center;
     width:100%;
-    background-color: #112211;
+    background-color: var(--dark-color);
     color: #bbb;
     user-select: none;
 }
@@ -98,7 +103,7 @@ input[type="radio"]:hover {
 
 
 .wb-body {
-    background-color: #112211;
+    background-color: var(--dark-color);
 }
 
 input.pickerfilter {

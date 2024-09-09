@@ -77,7 +77,7 @@
             
             Engine.fileReadText(GMF.projectDirectory + data.spriteId.path, (data) => {
                 data = yypParse(data);
-                callback(spriteDirectoryPath + data.frames[0].name + ".png");
+                callback({data:data, img_path: spriteDirectoryPath + data.frames[0].name + ".png"});
             });
         });
     }
