@@ -14,6 +14,20 @@
     }
     Settings.saveData = saveData;
 
+    function saveValue(key, value)
+    {
+        settings[key] = value;
+        Engine.fileWriteText("settings.cfg", JSON.stringify(settings));
+    }
+    Settings.saveValue = saveValue;
+
+    function loadValue(key, _default)
+    {
+        if (settings[key] != null) return settings[key];
+        return _default;
+    }
+    Settings.loadValue = loadValue;
+
     Settings.getWindowSize = function(name, x, y, w, h) {
         if (settings.windows == null) { return {x:x, y:y, w:w, h:h}; }
         if (settings.windows[name] == null) { return {x:x, y:y, w:w, h:h}; }

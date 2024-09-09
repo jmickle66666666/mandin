@@ -77,11 +77,16 @@
         }
     }
 
-    function loadRoom()
+    function loadSelectedRoom()
     {
-        log("load room: "+getSelected());
+        loadRoom(getSelected());
+    }
 
-        GMF.getRoomData(getSelected(), (data) => {
+    function loadRoom(room) 
+    {
+        log("loading room: "+room);
+        Settings.saveValue("lastLoadedRoom", room);
+        GMF.getRoomData(room, (data) => {
             console.log(data);
             Layers.buildList(data);
             Room.renderRoom(data, (canvas) => {
@@ -89,13 +94,14 @@
             });
         });
     }
+    RoomPicker.loadRoom = loadRoom;
 
     document.querySelector("#roompickerfilter").addEventListener("input", () => {
         buildList(cachedRooms, document.querySelector("#roompickerfilter").value);
     })
-    document.querySelector("#roompickerlist").addEventListener("dblclick", loadRoom);
+    document.querySelector("#roompickerlist").addEventListener("dblclick", loadSelectedRoom);
     document.querySelector("#btn_rooms").addEventListener("click", openWindow);
-    document.querySelector("#btn_roompickerload").addEventListener("click", loadRoom);
+    document.querySelector("#btn_roompickerload").addEventListener("click", loadSelectedRoom);
 
     window.RoomPicker = RoomPicker;
 })();

@@ -82,7 +82,6 @@
                         ctx.drawImage(img, inst.x - sprite_data.data.sequence.xorigin, inst.y - sprite_data.data.sequence.yorigin);
                     })
                 });
-                log(inst);
             }
         }
     }
