@@ -2,7 +2,7 @@ Engine.setIcon("assets/icon.png");
 
 window.onload = () => {
     
-    Engine.setTitle("Mandin");
+    
     Engine.fileReadText("settings.cfg", (data) => {
         data = JSON.parse(data);
         Settings.loadData(data);
@@ -23,6 +23,7 @@ window.onload = () => {
         if (window.visualViewport.width != windowSize.w || window.visualViewport.height != windowSize.h) {
             Engine.setSize(Math.floor(windowSize.w), Math.floor(windowSize.h));
         }
+        Engine.setTitle("Mandin");
     });
 
 

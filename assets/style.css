@@ -13,6 +13,7 @@ body {
     margin: 0px;
     font-family: "FixederSys", monospace;
     background-color: var(--dark-color);
+    background: url("bg2.png");
 }
 
 windows {

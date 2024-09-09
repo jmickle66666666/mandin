@@ -125,7 +125,7 @@
 
                                 for (let i = tx1; i <= tx2; i++) {
                                     for (let j = ty1; j <= ty2; j++) {
-                                        let index = tx + ty * tiles_per_row;
+                                        let index = i + j * tiles_per_row;
                                         if (TilePicker.currentTiles.indexOf(index) == -1) {
                                             TilePicker.currentTiles.push(index);
                                         }
