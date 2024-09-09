@@ -3,17 +3,25 @@ Engine.setIcon("assets/icon.png");
 window.onload = () => {
     
     Engine.setTitle("GMRoomEdit");
-    Engine.fileReadText("project.cfg", (data) => {
-        GMF.setProjectPath(data);
-        // GMF.listObjects();
+    Engine.fileReadText("settings.cfg", (data) => {
+        data = JSON.parse(data);
+        Settings.loadData(data);
+        GMF.setProjectPath(data.projectPath);
+        
+        if (Settings.getWindowOpen("objectpicker")) setTimeout(() => { ObjectPicker.openWindow(); }, 50 + Math.random() * 200);
+        if (Settings.getWindowOpen("roompicker")) setTimeout(() => { RoomPicker.openWindow(); }, 50 + Math.random() * 200);
+        if (Settings.getWindowOpen("log")) setTimeout(() => { openLog(); }, 50 + Math.random() * 200);
+
+        let windowSize = Settings.getWindowSize("window", -1, -1, 800, 600);
+        Engine.setSize(windowSize.w, windowSize.h);
     });
 
 
-    setTimeout(() => { ObjectPicker.openWindow(); }, 50 + Math.random() * 200);
-    setTimeout(() => { RoomPicker.openWindow(); }, 50 + Math.random() * 200);
-    setTimeout(() => { openLog(); }, 50 + Math.random() * 200);
-
-    Engine.fileReadText("D:/GitHub/Vividerie/rooms/ch_crystal_caves_17/ch_crystal_caves_17.yy", (data) => {
-        console.log(data);
+    window.addEventListener("resize", () => {
+        Settings.saveWindowWH(
+            "window",
+            window.visualViewport.width,
+            window.visualViewport.height
+        );
     });
 }

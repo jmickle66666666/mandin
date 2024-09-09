@@ -11,16 +11,24 @@
     function openWindow() {
         if (open) return;
         open = true;
+
+        let size = Settings.getWindowSize("tilePicker", 60, 60, 100, 300);
         winbox = new WinBox("Tile Picker", {
             mount: document.querySelector("div.wb#tilePicker"),
             onclose: () => {
                 open = false;
             },
-            x:"20%",
-            y:"center",
-            width:"10%",
-            height:"40%",
-            bottom:"2px"
+            x:size.x,
+            y:size.y,
+            width:size.w,
+            height:size.h,
+            bottom:"2px",
+            onresize: (w, h) => {
+                Settings.saveWindowWH("tilePicker", w, h)
+            },
+            onmove: (x, y) => {
+                Settings.saveWindowXY("tilePicker", x, y)
+            }
         });
     }
     TilePicker.openWindow = openWindow;

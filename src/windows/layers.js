@@ -9,14 +9,23 @@
     function openWindow() {
         if (open) return;
         open = true;
+        let size = Settings.getWindowSize("layers", 20, 20, 100, 300);
+        
         winbox = new WinBox("Layers", {
             mount: document.querySelector("div.wb#layers"),
             onclose: () => {
                 open = false;
             },
-            x:"70%",
-            y:"center",
-            width:"20%"
+            x:size.x,
+            y:size.y,
+            width:size.w,
+            height:size.h,
+            onresize: (w, h) => {
+                Settings.saveWindowWH("layers", w, h)
+            },
+            onmove: (x, y) => {
+                Settings.saveWindowXY("layers", x, y)
+            }
         });
     }
     Layers.openWindow = openWindow;

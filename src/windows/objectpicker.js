@@ -8,15 +8,26 @@
     function openWindow() {
         if (open) return;
         open = true;
+        Settings.saveWindowOpen("objectpicker", true);
+        let size = Settings.getWindowSize("objectpicker", 40, 40, 200, 500);
         winbox = new WinBox("Object Picker", {
             mount: document.querySelector("div.wb#objectpicker"),
             onclose: () => {
                 open = false;
+                Settings.saveWindowOpen("objectpicker", false);
             },
-            x:"right",
-            y:"center",
-            width:"30%"
+            x:size.x,
+            y:size.y,
+            width:size.w,
+            height:size.h,
+            onresize: (w, h) => {
+                Settings.saveWindowWH("objectpicker", w, h)
+            },
+            onmove: (x, y) => {
+                Settings.saveWindowXY("objectpicker", x, y)
+            }
         });
+        
 
         // refresh the object list
         let objectPicker = document.querySelector("#objectpickerlist");

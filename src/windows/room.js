@@ -171,16 +171,23 @@
     function openWindow(w, h) {
         if (open) return;
         open = true;
+        let size = Settings.getWindowSize("room", 10, 10, 400, 300);
         winbox = new WinBox("Room Viewer", {
             mount: document.querySelector("div.wb#roomViewer"),
             onclose: () => {
                 open = false;
             },
-            x:"center",
-            y:"center",
-            width:Math.min(800, w + 64),
-            height:Math.min(600, h + 64),
-            bottom:"2px"
+            x:size.x,
+            y:size.y,
+            width:size.w,
+            height:size.h,
+            bottom:"2px",
+            onresize: (w, h) => {
+                Settings.saveWindowWH("room", w, h)
+            },
+            onmove: (x, y) => {
+                Settings.saveWindowXY("room", x, y)
+            }
         });
     }
 

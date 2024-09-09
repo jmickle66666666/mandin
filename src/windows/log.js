@@ -6,17 +6,28 @@
     function openWindow() {
         if (open) return;
         open = true;
+        Settings.saveWindowOpen("log", true);
+        let size = Settings.getWindowSize("log", 30, 30, 400, 200);
         winbox = new WinBox("Log", {
             mount: document.querySelector("div.wb#log"),
             onclose: () => {
                 open = false;
+                Settings.saveWindowOpen("log", false);
             },
-            x:"center",
-            y:"bottom",
-            width:"70%",
-            height:"30%",
-            bottom:"2px"
+            x:size.x,
+            y:size.y,
+            width:size.w,
+            height:size.h,
+            bottom:"2px",
+            onresize: (w, h) => {
+                Settings.saveWindowWH("log", w, h)
+            },
+            onmove: (x, y) => {
+                console.log("hi");
+                Settings.saveWindowXY("log", x, y)
+            }
         });
+        
     }
 
     document.querySelector("#btn_log").addEventListener("click", openWindow);

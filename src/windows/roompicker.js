@@ -8,16 +8,27 @@
     function openWindow() {
         if (open) return;
         open = true;
+        Settings.saveWindowOpen("roompicker", true);
+
+        let size = Settings.getWindowSize("roompicker", 50, 50, 200, 500);
         winbox = new WinBox("Room Picker", {
             mount: document.querySelector("div.wb#roompicker"),
             onclose: () => {
                 open = false;
+                Settings.saveWindowOpen("roompicker", false);
             },
-            x:"center",
-            y:"center",
-            width:"30%"
+            x:size.x,
+            y:size.y,
+            width:size.w,
+            height:size.h,
+            onresize: (w, h) => {
+                Settings.saveWindowWH("roompicker", w, h)
+            },
+            onmove: (x, y) => {
+                Settings.saveWindowXY("roompicker", x, y)
+            }
         });
-
+        
         // refresh the object list
         let roomPicker = document.querySelector("#roompickerlist");
         roomPicker.innerHTML = "";
