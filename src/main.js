@@ -2,7 +2,7 @@ Engine.setIcon("assets/icon.png");
 
 window.onload = () => {
     
-    Engine.setTitle("GMRoomEdit");
+    Engine.setTitle("Mandin");
     Engine.fileReadText("settings.cfg", (data) => {
         data = JSON.parse(data);
         Settings.loadData(data);
