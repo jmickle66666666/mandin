@@ -121,6 +121,7 @@
     }
 
     function renderRoom(_roomData) {
+        TilePicker.clear();
         roomData = _roomData;
         let canvas = document.createElement("canvas");
         let ctx = canvas.getContext("2d");
