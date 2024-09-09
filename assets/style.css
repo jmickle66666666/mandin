@@ -21,19 +21,31 @@ windows {
 
 div.menubar {
     margin: 0px;
-    background: linear-gradient(0deg, #b47f26, var(--main-color));
+    /* background: linear-gradient(0deg, #b47f26, var(--main-color)); */
+    background: url("fruitygrad.png");
+    display:flex;
 }
 
 button {
     margin: 0px;
     border:none;
     font-size: 1em;
-    background: linear-gradient(0deg, #b47f26, var(--main-color));
+    background: url("fruitygrad.png");
+    background-size:contain;
+    border-style: solid;
+    border-width: 0 7 0 7;
+    border-image-source: url("fruitybutton.png");
+    border-image-slice: 0 7 0 7;
     height:32px;
 }
 
 button:hover {
-    background-color: white;
+    /* background: #ffbb00; */
+    filter:invert();
+}
+
+button#fill:hover {
+    filter:unset;
 }
 
 @font-face {
@@ -54,7 +66,14 @@ button:hover {
 }
 
 .wb-header {
-    background: linear-gradient(0deg, #b47f26, var(--main-color));
+    background: url("fruitygrad.png");
+    background-size: contain;
+    background-repeat: repeat;
+    border-style: solid;
+    border-width: 0 7 0 7;
+    border-image-source: url("fruitybutton.png");
+    border-image-slice: 0 7 0 7;
+    width:calc(100% - 14px);
 }
 
 .wb-control {
@@ -203,4 +222,5 @@ img {
 #layerlist .listOption button {
     height:24px;
     width: 24px;
+    background-size: contain;
 }
