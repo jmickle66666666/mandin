@@ -13,15 +13,15 @@ window.onload = () => {
         if (Settings.getWindowOpen("log")) setTimeout(() => { openLog(); }, 50 + Math.random() * 200);
 
         let windowSize = Settings.getWindowSize("window", -1, -1, 800, 600);
-        Engine.setSize(windowSize.w, windowSize.h);
+        Engine.setSize(Math.floor(windowSize.w), Math.floor(windowSize.h));
     });
 
 
     window.addEventListener("resize", () => {
         Settings.saveWindowWH(
             "window",
-            window.visualViewport.width,
-            window.visualViewport.height
+            Math.floor(window.visualViewport.width),
+            Math.floor(window.visualViewport.height)
         );
     });
 }
