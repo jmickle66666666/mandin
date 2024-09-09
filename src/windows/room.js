@@ -170,6 +170,9 @@
         }
 
         openWindow(canvas.width, canvas.height);
+
+        let rect = rv.getBoundingClientRect();
+        moveView((rect.width - canvas.width*zoom)/2, (rect.height - canvas.height*zoom)/2);
     }
     Room.renderRoom = renderRoom;
 
