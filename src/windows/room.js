@@ -221,6 +221,12 @@
                 paintTile();
             }
         }
+
+        if (e.button == 2) {
+            if (Layers.currentLayer != null && Layers.currentLayer["$GMRTileLayer"] != null) {
+                deleteTile();
+            }
+        }
     });
 
     let lastdrawpos = {x:-1, y:-1};
@@ -241,6 +247,20 @@
                     drawTile(roomLayers[i].tileset_image, roomLayers[i].getContext("2d"), newTile, x, y, tilesetData.tileWidth, tilesetData.tileHeight);
                     break;
                 }
+            }
+        }
+    }
+
+    function deleteTile() {
+        let x = Math.floor(((mx-dx*zoom) / tilesetData.tileWidth)/zoom);
+        let y = Math.floor(((my-dy*zoom) / tilesetData.tileHeight)/zoom);
+        let index = x + y * Layers.currentLayer.tiles.SerialiseWidth;
+        index += 1;
+        Layers.currentLayer.tiles["TileCompressedData"][index] = 0;
+        for (let i = 0; i < roomLayers.length; i++) {
+            if (roomLayers[i].layer == Layers.currentLayer) {
+                roomLayers[i].getContext("2d").clearRect(x * tilesetData.tileWidth, y * tilesetData.tileHeight, tilesetData.tileWidth, tilesetData.tileWidth);
+                break;
             }
         }
     }
