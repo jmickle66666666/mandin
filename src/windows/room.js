@@ -317,6 +317,11 @@
         let r = rv.getBoundingClientRect();
         mx = e.pageX - r.x;
         my = e.pageY - r.y;
+
+        if (Settings.loadValue("mousefix", false)) {
+            mx = e.pageX - r.x*zoom;
+            my = e.pageY - r.y*zoom;
+        }
     });
 
     let zoom = 1.0;

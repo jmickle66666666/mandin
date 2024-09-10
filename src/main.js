@@ -40,6 +40,11 @@ window.onload = () => {
                 loadProject(data.projectPath);
             }
         });
+
+        document.querySelector("#btn_mousefix").addEventListener("click", () => {
+            Settings.saveValue("mousefix", !Settings.loadValue("mousefix", false));
+            log(`Turned ${Settings.loadValue("mousefix", false)?"on":"off"} the mouse fix!`);
+        });
     });
 
     Engine.setTitle("Mandin");
