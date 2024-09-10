@@ -223,9 +223,13 @@
         }
     });
 
+    let lastdrawpos = {x:-1, y:-1};
     function paintTile() {
         let x = Math.floor(((mx-dx*zoom) / tilesetData.tileWidth)/zoom);
         let y = Math.floor(((my-dy*zoom) / tilesetData.tileHeight)/zoom);
+        if (x == lastdrawpos.x && y == lastdrawpos.y) return;
+        lastdrawpos.x = x;
+        lastdrawpos.y = y;
         let index = x + y * Layers.currentLayer.tiles.SerialiseWidth;
         index += 1;
         let newTile = TilePicker.getCurrentTile();
