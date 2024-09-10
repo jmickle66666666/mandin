@@ -135,12 +135,7 @@
         let canvas = document.createElement("canvas");
         let ctx = canvas.getContext("2d");
         
-        // let layers = JSON.parse(JSON.stringify(roomData.layers));
         let layers = roomData.layers;
-        
-        // console.log(layers);
-        // layers.sort((a, b) => {return b.depth - a.depth;});
-        // console.log(layers);
         
         canvas.width = roomData.roomSettings.Width;
         canvas.height = roomData.roomSettings.Height;
@@ -170,7 +165,11 @@
         openWindow(canvas.width, canvas.height);
 
         let rect = rv.getBoundingClientRect();
-        moveView((rect.width - canvas.width*zoom)/2, (rect.height - canvas.height*zoom)/2);
+        if (Settings.loadValue("mousefix", false)) {
+            moveView((rect.width - canvas.width)/2, (rect.height - canvas.height)/2);
+        } else {
+            moveView((rect.width - canvas.width*zoom)/2, (rect.height - canvas.height*zoom)/2);
+        }
     }
     Room.renderRoom = renderRoom;
 

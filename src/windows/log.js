@@ -58,16 +58,10 @@
         newlog.className = "logmessage";
 
         let logdiv = document.querySelector("div.wb#log");
-        // console.log(`why ${logdiv.scrollTop} ${logdiv.scrollHeight}`);
-        let doScroll = logdiv.scrollTop == logdiv.scrollHeight;
-
+        
         logdiv.appendChild(newlog);
 
-        // if (doScroll) {
-            logdiv.scrollTop = logdiv.scrollHeight;
-        // } else {
-        //     console.log("whtho");
-        // }
+        logdiv.parentElement.scrollTop = logdiv.scrollHeight;
     }
 
     window.openLog = openWindow;
