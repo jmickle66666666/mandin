@@ -29,5 +29,19 @@
         return "#"+r+g+b+a;
     }
 
+    Util.textInput = function(title, callback) {
+        let listener = () => {
+            document.querySelector("#btn_textinput").removeEventListener("click", listener);
+            dialog.close();
+            callback(document.querySelector("#textinputfield").value);
+        }
+        document.querySelector("#btn_textinput").addEventListener("click", listener);
+        let dialog = new WinBox(title, {
+            modal: true,
+            mount: document.querySelector("div.wb#textinput"),
+            height: 67,
+        }).removeControl("wb-close");
+    }
+
     window.Util = Util;
 })();

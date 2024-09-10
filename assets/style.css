@@ -225,3 +225,11 @@ img {
     width: 24px;
     background-size: contain;
 }
+
+div.wb#textinput {
+    display:flex;
+}
+
+div.wb#textinput input {
+    flex-shrink: 1;
+}

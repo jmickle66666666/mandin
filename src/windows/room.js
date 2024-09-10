@@ -76,8 +76,6 @@
             let instances = layer.instances;
             for (let inst of instances) {
                 GMF.getObjectSprite(inst.objectId.name, (sprite_data) => {
-                    
-                    if (sprite_data.data.origin == 9) console.log(sprite_data.data);
                     Util.loadImage(sprite_data.img_path, (img) => {
                         ctx.drawImage(img, inst.x - sprite_data.data.sequence.xorigin, inst.y - sprite_data.data.sequence.yorigin);
                     })
@@ -219,9 +217,6 @@
 
         if (e.button == 0) {
             holding = true;
-
-            log(`${Math.floor((mx / 8)/zoom)}, ${Math.floor((my / 8)/zoom)}`);
-
             if (Layers.currentLayer != null && Layers.currentLayer["$GMRTileLayer"] != null) {
                 paintTile();
             }

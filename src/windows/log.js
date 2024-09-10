@@ -23,7 +23,6 @@
                 Settings.saveWindowWH("log", w, h)
             },
             onmove: (x, y) => {
-                console.log("hi");
                 Settings.saveWindowXY("log", x, y)
             }
         });
