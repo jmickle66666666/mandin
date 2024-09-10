@@ -166,7 +166,7 @@
 
         let rect = rv.getBoundingClientRect();
         if (Settings.loadValue("mousefix", false)) {
-            moveView((rect.width/zoom - canvas.width*zoom)/2, (rect.height/zoom - canvas.height*zoom)/2);
+            moveView((rect.width*zoom - canvas.width*zoom)/2, (rect.height*zoom - canvas.height*zoom)/2);
         } else {
             moveView((rect.width - canvas.width*zoom)/2, (rect.height - canvas.height*zoom)/2);
         }
