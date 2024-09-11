@@ -45,6 +45,12 @@ window.onload = () => {
             Settings.saveValue("mousefix", !Settings.loadValue("mousefix", false));
             log(`Turned ${Settings.loadValue("mousefix", false)?"on":"off"} the mouse fix!`);
         });
+
+        addEventListener("keydown", (e) => {
+            if (e.key == "z" && e.ctrlKey) {
+                Undo.undo();
+            }
+        })
     });
 
     Engine.setTitle("Mandin");
