@@ -169,13 +169,24 @@
         outctx.imageSmoothingEnabled = false;
         render();
 
-        openWindow();
+        openWindow().onresize = () => {
+            outputCanvas.width = outputCanvas.parentElement.clientWidth;
+            outputCanvas.height = outputCanvas.parentElement.clientHeight;
+            outctx.imageSmoothingEnabled = false;
+            render();
+        }
 
         moveView((rv.clientWidth - width)/2, (rv.clientHeight - height)/2);
     }
     Room.loadRoom = loadRoom;
 
     function render() {
+        if (outputCanvas.width == 0) {
+            outputCanvas.width = outputCanvas.parentElement.clientWidth;
+            outputCanvas.height = outputCanvas.parentElement.clientHeight;
+            outctx.imageSmoothingEnabled = false;
+        }
+
         let t = outctx.getTransform();
         outctx.resetTransform();
         outctx.clearRect(0, 0, outctx.canvas.width, outctx.canvas.height);
@@ -216,6 +227,7 @@
                 Settings.saveWindowXY("room", x, y)
             }
         });
+        return winbox;
     }
 
     let dragging = false;
