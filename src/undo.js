@@ -53,11 +53,8 @@
                 }
             },
             undo: () => {
-                let s = 200/undos.length;
                 for (let i = 0; i < undos.length; i++) {
-                    setTimeout(() => {
-                        undos[i]();
-                    }, i*s);
+                    undos[i]();
                 }
             }
         });

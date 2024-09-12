@@ -4,6 +4,8 @@
     let roomData = null;
     let roomPath = null;
     let tilesetData = null;
+    let tilesetImage = null;
+    let brushSize = 1;
 
     let outputCanvas = null;
     let outctx = null;
@@ -37,6 +39,7 @@
                 GMF.getObjectSprite(layer.tilesetId.name, (sprite_data) => {
                     Util.loadImage(sprite_data.img_path, (tileset_image) => {
                         ctx.canvas.tileset_image = tileset_image;
+                        tilesetImage = tileset_image;
                         let tiles = layer.tiles["TileCompressedData"];
 
                         let pos = 0;
@@ -197,6 +200,16 @@
         {
             outctx.drawImage(roomLayers[i], 0, 0);
         }
+
+        if (Layers.onTileLayer()) {
+            let off = Math.floor(brushSize/2);
+            for (let i = 0; i < brushSize; i++) {
+                for (let j = 0; j < brushSize; j++) {
+                    drawTile(tilesetImage, outctx, TilePicker.getCurrentTile(mouseTile.x + mouseTile.y * (j+2) * (i+2)), -off + mouseTile.x + i, -off + mouseTile.y + j, tilesetData.tileWidth, tilesetData.tileHeight);
+                }
+            }
+        }
+
         requestAnimationFrame(render);
     }
     Room.render = render;
@@ -233,6 +246,7 @@
 
     let dragging = false;
     let holding = false;
+    let deleting = false;
     rv.addEventListener("mousedown", (e) => {
         if (e.button == 1) {
             dragging = true;
@@ -242,28 +256,40 @@
             holding = true;
             Undo.beginSubstack();
             if (Layers.onTileLayer()) {
-                let oldTile = getTile(mouseTile.x, mouseTile.y);
-                let newTile = TilePicker.getCurrentTile();
-                let x = mouseTile.x;
-                let y = mouseTile.y;
-                Undo.registerAction("Draw a tile", () => {
-                    paintTile(x, y, newTile);
-                }, () => {
-                    paintTile(x, y, oldTile);
-                });
+                let off = Math.floor(brushSize/2);
+                for (let i = 0; i < brushSize; i++) {
+                    for (let j = 0; j < brushSize; j++) {
+                        let newTile = TilePicker.getCurrentTile();
+                        let x = -off+mouseTile.x+i;
+                        let y = -off+mouseTile.y+j;
+                        let oldTile = getTile(x, y);
+                        Undo.registerAction("Draw a tile", () => {
+                            paintTile(x, y, newTile);
+                        }, () => {
+                            paintTile(x, y, oldTile);
+                        });
+                    }
+                }
             }
         }
 
         if (e.button == 2) {
+            deleting = true;
+            Undo.beginSubstack();
             if (Layers.onTileLayer()) {
-                let oldTile = getTile(mouseTile.x, mouseTile.y);
-                let x = mouseTile.x;
-                let y = mouseTile.y;
-                Undo.registerAction("Delete a tile", () => {
-                    deleteTile(x, y);
-                }, () => {
-                    paintTile(x, y, oldTile);
-                });
+                let off = Math.floor(brushSize/2);
+                for (let i = 0; i < brushSize; i++) {
+                    for (let j = 0; j < brushSize; j++) {
+                        let x = -off+mouseTile.x+i;
+                        let y = -off+mouseTile.y+j;
+                        let oldTile = getTile(x, y);
+                        Undo.registerAction("Draw a tile", () => {
+                            deleteTile(x, y);
+                        }, () => {
+                            paintTile(x, y, oldTile);
+                        });
+                    }
+                }
             }
         }
     });
@@ -273,7 +299,7 @@
     }
 
     let lastdrawpos = {x:-1, y:-1};
-    function paintTile(x, y, tile) {
+    function paintTile(x, y, tile, size) {
         let index = x + y * Layers.currentLayer.tiles.SerialiseWidth;
         index += 1;
         Layers.currentLayer.tiles["TileCompressedData"][index] = tile;
@@ -305,6 +331,14 @@
             let path = GMF.getRoomDataPath(roomData["%Name"]);
             Engine.fileWriteText(path, JSON.stringify(roomData));
         }
+
+        if (e.key == "]") {
+            brushSize += 1;
+        }
+
+        if (e.key == "[") {
+            if (brushSize > 1) brushSize -= 1;
+        }
     })
 
     window.addEventListener("mouseup", (e) => {
@@ -317,6 +351,13 @@
                 Undo.compressSubstack("painting lots of tiles");
             }
             holding = false;
+        }
+
+        if (e.button == 2) {
+            if (deleting) {
+                Undo.compressSubstack("deleting lots of tiles");
+            }
+            deleting = false;
         }
     });
 
@@ -335,15 +376,41 @@
                 lastdrawpos.x = mouseTile.x;
                 lastdrawpos.y = mouseTile.y;
 
-                let oldTile = getTile(mouseTile.x, mouseTile.y);
-                let newTile = TilePicker.getCurrentTile();
-                let x = mouseTile.x;
-                let y = mouseTile.y;
-                Undo.registerAction("Draw a tile", () => {
-                    paintTile(x, y, newTile);
-                }, () => {
-                    paintTile(x, y, oldTile);
-                });
+                let off = Math.floor(brushSize/2);
+                for (let i = 0; i < brushSize; i++) {
+                    for (let j = 0; j < brushSize; j++) {
+                        let newTile = TilePicker.getCurrentTile();
+                        let x = -off+mouseTile.x+i;
+                        let y = -off+mouseTile.y+j;
+                        let oldTile = getTile(x, y);
+                        Undo.registerAction("Draw a tile", () => {
+                            paintTile(x, y, newTile);
+                        }, () => {
+                            paintTile(x, y, oldTile);
+                        });
+                    }
+                }
+            }
+        }
+
+        if (deleting && Layers.onTileLayer()) {
+            if (mouseTile.x != lastdrawpos.x || mouseTile.y != lastdrawpos.y) {
+                lastdrawpos.x = mouseTile.x;
+                lastdrawpos.y = mouseTile.y;
+
+                let off = Math.floor(brushSize/2);
+                for (let i = 0; i < brushSize; i++) {
+                    for (let j = 0; j < brushSize; j++) {
+                        let x = -off+mouseTile.x+i;
+                        let y = -off+mouseTile.y+j;
+                        let oldTile = getTile(x, y);
+                        Undo.registerAction("Draw a tile", () => {
+                            deleteTile(x, y);
+                        }, () => {
+                            paintTile(x, y, oldTile);
+                        });
+                    }
+                }
             }
         }
 
@@ -369,12 +436,17 @@
     });
 
     rv.addEventListener("wheel", (e) => {
-        let scaleFactor = 1;
-        if (e.deltaY < 0) scaleFactor = 1.2;
-        if (e.deltaY > 0) scaleFactor = 1/1.2;
-        outctx.translate(mouseRoom.x, mouseRoom.y);
-        outctx.scale(scaleFactor, scaleFactor);
-        outctx.translate(-mouseRoom.x, -mouseRoom.y);
+        if (e.ctrlKey) {
+            if (e.deltaY > 0 && brushSize > 1) brushSize -= 1;
+            if (e.deltaY < 0) brushSize += 1;
+        } else {
+            let scaleFactor = 1;
+            if (e.deltaY < 0) scaleFactor = 1.2;
+            if (e.deltaY > 0) scaleFactor = 1/1.2;
+            outctx.translate(mouseRoom.x, mouseRoom.y);
+            outctx.scale(scaleFactor, scaleFactor);
+            outctx.translate(-mouseRoom.x, -mouseRoom.y);
+        }
     });
 
     window.Room = Room;

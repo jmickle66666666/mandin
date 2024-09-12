@@ -1,10 +1,21 @@
 (function() {
     let TilePicker = {};
 
+    TilePicker.previewCanvas = document.createElement("canvas");
+    TilePicker.previewCanvasCtx = TilePicker.previewCanvas.getContext("2d");
+    TilePicker.brushSize = 1;
+    let tileWidth = 0;
+    let tileHeight = 0;
+    let tilesetImage = null;
+
     TilePicker.currentTiles = [];
-    TilePicker.getCurrentTile = function () {
+    TilePicker.getCurrentTile = function (seed=-1) {
         if (TilePicker.currentTiles.length == 0) return -1;
-        return TilePicker.currentTiles[Math.floor(Math.random() * TilePicker.currentTiles.length)];
+        if (seed == -1) {
+            return TilePicker.currentTiles[Math.floor(Math.random() * TilePicker.currentTiles.length)];
+        } else {
+            return TilePicker.currentTiles[Util.random(seed) % TilePicker.currentTiles.length];
+        }
     }
     let pickDrag = false;
     let pickDragStart = null;
@@ -45,11 +56,14 @@
         openWindow();
         GMF.getObjectSprite(tileset, (sprite_data) => {
             Util.loadImage(sprite_data.img_path, (img) => {
+                tilesetImage = img;
                 document.querySelector("div.wb#tilePicker").appendChild(img);
 
                 GMF.getAssetData(tileset, (tileset_data) => {
                     GMF.getAssetData(tileset_data.spriteId.name, (sprite_data) => {
                         let sw = tileset_data.tileWidth / sprite_data.width;
+                        tileWidth = tileset_data.tileWidth;
+                        tileHeight = tileset_data.tileHeight;
                         highlight = document.createElement("canvas");
                         highlight.style.opacity = 0.4;
                         let hctx = highlight.getContext('2d');
@@ -115,8 +129,6 @@
                                 let tileIndex = Math.floor(x * tiles_per_row) + Math.floor(y * tiles_per_row) * tiles_per_row;
                                 let tx = tileIndex % tiles_per_row;
                                 let ty = Math.floor(tileIndex / tiles_per_row);
-
-                                
 
                                 let tx1 = Math.min(pickDragStart.x, tx);
                                 let ty1 = Math.min(pickDragStart.y, ty);
