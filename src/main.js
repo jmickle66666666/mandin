@@ -49,6 +49,7 @@ window.onload = () => {
         addEventListener("keydown", (e) => {
             if (e.key == "z" && e.ctrlKey) {
                 Undo.undo();
+                e.preventDefault();
             }
         })
     });
