@@ -6,6 +6,16 @@
 
     Layers.currentLayer = null;
 
+    function onTileLayer() {
+        return Layers.currentLayer != null && Layers.currentLayer["$GMRTileLayer"] != null;
+    }
+    Layers.onTileLayer = onTileLayer;
+
+    function onInstanceLayer() {
+        return Layers.currentLayer != null && Layers.currentLayer["$GMRInstanceLayer"] != null;
+    }
+    Layers.onInstanceLayer = onInstanceLayer;
+
     function openWindow() {
         if (open) return;
         open = true;

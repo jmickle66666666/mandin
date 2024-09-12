@@ -5,9 +5,13 @@
     let roomPath = null;
     let tilesetData = null;
 
+    let outputCanvas = null;
+    let outctx = null;
+
     let rv = document.querySelector("div.wb#roomViewer");
 
     let roomLayers = [];
+    let instances = [];
 
     function drawTile(src, dest, index, x, y, tileWidth, tileHeight)
     {
@@ -127,51 +131,62 @@
         }
     }
 
-    function renderRoom(_roomData) {
+    function loadRoom(_roomData) {
         TilePicker.clear();
         dx = 0;
         dy = 0;
         roomData = _roomData;
-        let canvas = document.createElement("canvas");
-        let ctx = canvas.getContext("2d");
-        
         let layers = roomData.layers;
         
-        canvas.width = roomData.roomSettings.Width;
-        canvas.height = roomData.roomSettings.Height;
+        let width = roomData.roomSettings.Width;
+        let height = roomData.roomSettings.Height;
 
         rv.innerHTML = "";
         roomLayers = [];
         for (let i = 0; i < layers.length; i++)
         {
             let cnv = document.createElement("canvas");
-            cnv.width = canvas.width;
-            cnv.height = canvas.height;
+            cnv.width = width;
+            cnv.height = height;
             let _ctx = cnv.getContext("2d");
+            _ctx.imageSmoothingEnabled = false;
             drawLayer(_ctx, layers[i]);
             cnv.style.position = "absolute";
-            cnv.style.width = (canvas.width).toString()+"px";
+            cnv.style.width = (width).toString()+"px";
             cnv.layer = layers[i];
             roomLayers.push(cnv);
         }
         
         roomLayers.sort((a, b) => b.layer.depth - a.layer.depth);
         
+        if (outputCanvas == null) {
+            outputCanvas = document.createElement("canvas");
+            outctx = outputCanvas.getContext("2d");
+        }
+        rv.appendChild(outputCanvas);
+        outputCanvas.width = outputCanvas.parentElement.clientWidth;
+        outputCanvas.height = outputCanvas.parentElement.clientHeight;
+        outctx.imageSmoothingEnabled = false;
+        render();
+
+        openWindow();
+
+        moveView((rv.clientWidth - width)/2, (rv.clientHeight - height)/2);
+    }
+    Room.loadRoom = loadRoom;
+
+    function render() {
+        let t = outctx.getTransform();
+        outctx.resetTransform();
+        outctx.clearRect(0, 0, outctx.canvas.width, outctx.canvas.height);
+        outctx.setTransform(t);
         for (let i = 0; i < roomLayers.length; i++)
         {
-            rv.appendChild(roomLayers[i]);
+            outctx.drawImage(roomLayers[i], 0, 0);
         }
-
-        openWindow(canvas.width, canvas.height);
-
-        let rect = rv.getBoundingClientRect();
-        if (Settings.loadValue("mousefix", false)) {
-            moveView((rect.width*zoom - canvas.width*zoom)/2, (rect.height*zoom - canvas.height*zoom)/2);
-        } else {
-            moveView((rect.width - canvas.width*zoom)/2, (rect.height - canvas.height*zoom)/2);
-        }
+        requestAnimationFrame(render);
     }
-    Room.renderRoom = renderRoom;
+    Room.render = render;
 
     function updateVisibility() {
         for (let i = 0; i < roomLayers.length; i++) {
@@ -204,10 +219,6 @@
     }
 
     let dragging = false;
-    let dx = 0;
-    let dy = 0;
-    let mx = 0;
-    let my = 0;
     let holding = false;
     rv.addEventListener("mousedown", (e) => {
         if (e.button == 1) {
@@ -217,11 +228,11 @@
         if (e.button == 0) {
             holding = true;
             Undo.beginSubstack();
-            if (Layers.currentLayer != null && Layers.currentLayer["$GMRTileLayer"] != null) {
-                let oldTile = getTile(tx, ty);
+            if (Layers.onTileLayer()) {
+                let oldTile = getTile(mouseTile.x, mouseTile.y);
                 let newTile = TilePicker.getCurrentTile();
-                let x = tx;
-                let y = ty;
+                let x = mouseTile.x;
+                let y = mouseTile.y;
                 Undo.registerAction("Draw a tile", () => {
                     paintTile(x, y, newTile);
                 }, () => {
@@ -231,14 +242,13 @@
         }
 
         if (e.button == 2) {
-            if (Layers.currentLayer != null && Layers.currentLayer["$GMRTileLayer"] != null) {
-                let oldTile = getTile(tx, ty);
-                let x = tx;
-                let y = ty;
+            if (Layers.onTileLayer()) {
+                let oldTile = getTile(mouseTile.x, mouseTile.y);
+                let x = mouseTile.x;
+                let y = mouseTile.y;
                 Undo.registerAction("Delete a tile", () => {
                     deleteTile(x, y);
                 }, () => {
-                    log(`${x} ${y} ${oldTile}`);
                     paintTile(x, y, oldTile);
                 });
             }
@@ -297,21 +307,8 @@
     });
 
     function moveView(x, y) {
-        dx += x/zoom;
-        dy += y/zoom;
-        for (let i = 0; i < roomLayers.length; i++) {
-            roomLayers[i].style.left = `${dx}px`;
-            roomLayers[i].style.top = `${dy}px`;
-        }
-    }
-
-    function moveViewTo(x, y) {
-        dx = x/zoom;
-        dy = y/zoom;
-        for (let i = 0; i < roomLayers.length; i++) {
-            roomLayers[i].style.left = `${dx}px`;
-            roomLayers[i].style.top = `${dy}px`;
-        }
+        let transform = outctx.getTransform();
+        outctx.translate(x / transform.a, y / transform.d);
     }
 
     window.addEventListener("mousemove", (e) => {
@@ -319,53 +316,48 @@
             moveView(e.movementX, e.movementY);
         }
 
-        if (holding) {
-            if (Layers.currentLayer != null && Layers.currentLayer["$GMRTileLayer"] != null) {
-                if (tx != lastdrawpos.x || ty != lastdrawpos.y) {
-                    lastdrawpos.x = tx;
-                    lastdrawpos.y = ty;
-    
-                    let oldTile = getTile(tx, ty);
-                    let newTile = TilePicker.getCurrentTile();
-                    let x = tx;
-                    let y = ty;
-                    Undo.registerAction("Draw a tile", () => {
-                        paintTile(x, y, newTile);
-                    }, () => {
-                        paintTile(x, y, oldTile);
-                    });
+        if (holding && Layers.onTileLayer()) {
+            if (mouseTile.x != lastdrawpos.x || mouseTile.y != lastdrawpos.y) {
+                lastdrawpos.x = mouseTile.x;
+                lastdrawpos.y = mouseTile.y;
+
+                let oldTile = getTile(mouseTile.x, mouseTile.y);
+                let newTile = TilePicker.getCurrentTile();
+                let x = mouseTile.x;
+                let y = mouseTile.y;
+                Undo.registerAction("Draw a tile", () => {
+                    paintTile(x, y, newTile);
+                }, () => {
+                    paintTile(x, y, oldTile);
+                });
+            }
+        }
+
+        if (Layers.onInstanceLayer()) {
+            for (let inst of Layers.currentLayer.instances) {
+                if (mouseRoom.x >= inst.x && mouseRoom.y >= inst.y && mouseRoom.x < inst.x + 16 && mouseRoom.y < inst.y + 16) {
+                    highlightRect(inst.x, inst.y, 8, 8);
                 }
             }
         }
     });
 
-    let tx = 0;
-    let ty = 0;
+    let mouseRoom = {x:0, y:0};
+    let mouseTile = {x:0, y:0};
     rv.addEventListener("mousemove", (e) => {
-        let r = rv.getBoundingClientRect();
-        mx = e.pageX - r.x;
-        my = e.pageY - r.y;
-
-        if (Settings.loadValue("mousefix", false)) {
-            mx = e.pageX - r.x*zoom;
-            my = e.pageY - r.y*zoom;
-        }
-        
-        tx = Math.floor(((mx-dx*zoom) / tilesetData.tileWidth)/zoom);
-        ty = Math.floor(((my-dy*zoom) / tilesetData.tileHeight)/zoom);
+        let t = outctx.getTransform().inverse();
+        mouseRoom = t.transformPoint({x: e.offsetX, y:e.offsetY});
+        mouseTile.x = Math.floor(mouseRoom.x / tilesetData.tileWidth);
+        mouseTile.y = Math.floor(mouseRoom.y / tilesetData.tileHeight);
     });
 
-    let zoom = 1.0;
     rv.addEventListener("wheel", (e) => {
-        let oldZoom = zoom;
-        if (e.deltaY < 0) zoom *= 1.2;
-        if (e.deltaY > 0) zoom /= 1.2;
-
-        let zoomDiff = zoom-oldZoom;
-
-        moveView((-mx/oldZoom) * zoomDiff, (-my/oldZoom) * zoomDiff);
-
-        rv.style.zoom = `${zoom*100}%`;
+        let scaleFactor = 1;
+        if (e.deltaY < 0) scaleFactor = 1.2;
+        if (e.deltaY > 0) scaleFactor = 1/1.2;
+        outctx.translate(mouseRoom.x, mouseRoom.y);
+        outctx.scale(scaleFactor, scaleFactor);
+        outctx.translate(-mouseRoom.x, -mouseRoom.y);
     });
 
     window.Room = Room;
