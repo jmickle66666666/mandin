@@ -198,7 +198,9 @@
         outctx.setTransform(t);
         for (let i = 0; i < roomLayers.length; i++)
         {
-            outctx.drawImage(roomLayers[i], 0, 0);
+            if (roomLayers[i].layer.visible) {
+                outctx.drawImage(roomLayers[i], 0, 0);
+            }
         }
 
         if (Layers.onTileLayer()) {
