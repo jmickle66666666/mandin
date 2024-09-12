@@ -20,6 +20,13 @@ function loadProject(projectPath) {
     }
 }
 
+function projectSetup() {
+    Util.textInput("Hey! type in ur favorite project path here", Settings.loadValue("projectPath", ""), (value) => {
+        Settings.saveValue("projectPath", value);
+        location.reload();
+    });
+}
+
 window.onload = () => {
     
     Engine.fileExists("settings.cfg", (exists) => {
@@ -31,11 +38,7 @@ window.onload = () => {
             data = JSON.parse(data);
             Settings.loadData(data);
             if (data.projectPath == null) {
-                Util.textInput("Hey! type in ur favorite project path here", (value) => {
-                    data.projectPath = value;
-                    Settings.saveValue("projectPath", value);
-                    loadProject(data.projectPath);
-                })
+                projectSetup();         
             } else {
                 loadProject(data.projectPath);
             }
@@ -47,6 +50,8 @@ window.onload = () => {
                 e.preventDefault();
             }
         })
+
+        document.querySelector("#btn_project_setup").addEventListener("click", projectSetup);
     });
 
     Engine.setTitle("Mandin");
