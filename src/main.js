@@ -41,11 +41,6 @@ window.onload = () => {
             }
         });
 
-        document.querySelector("#btn_mousefix").addEventListener("click", () => {
-            Settings.saveValue("mousefix", !Settings.loadValue("mousefix", false));
-            log(`Turned ${Settings.loadValue("mousefix", false)?"on":"off"} the mouse fix!`);
-        });
-
         addEventListener("keydown", (e) => {
             if (e.key == "z" && e.ctrlKey) {
                 Undo.undo();

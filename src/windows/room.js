@@ -12,6 +12,7 @@
 
     let roomLayers = [];
     let instances = [];
+    let winbox = null;
 
     function drawTile(src, dest, index, x, y, tileWidth, tileHeight)
     {
@@ -169,14 +170,14 @@
         outctx.imageSmoothingEnabled = false;
         render();
 
-        openWindow().onresize = () => {
+        openWindow();
+        winbox.onresize = () => {
             outputCanvas.width = outputCanvas.parentElement.clientWidth;
             outputCanvas.height = outputCanvas.parentElement.clientHeight;
             outctx.imageSmoothingEnabled = false;
             render();
         }
-
-        moveView((rv.clientWidth - width)/2, (rv.clientHeight - height)/2);
+        moveView((outputCanvas.width - roomLayers[0].width)/2, (outputCanvas.height - roomLayers[0].height)/2);
     }
     Room.loadRoom = loadRoom;
 
@@ -185,6 +186,7 @@
             outputCanvas.width = outputCanvas.parentElement.clientWidth;
             outputCanvas.height = outputCanvas.parentElement.clientHeight;
             outctx.imageSmoothingEnabled = false;
+            moveView((outputCanvas.width - roomLayers[0].width)/2, (outputCanvas.height - roomLayers[0].height)/2);
         }
 
         let t = outctx.getTransform();
@@ -227,7 +229,6 @@
                 Settings.saveWindowXY("room", x, y)
             }
         });
-        return winbox;
     }
 
     let dragging = false;
@@ -360,8 +361,11 @@
     rv.addEventListener("mousemove", (e) => {
         let t = outctx.getTransform().inverse();
         mouseRoom = t.transformPoint({x: e.offsetX, y:e.offsetY});
-        mouseTile.x = Math.floor(mouseRoom.x / tilesetData.tileWidth);
-        mouseTile.y = Math.floor(mouseRoom.y / tilesetData.tileHeight);
+
+        if (Layers.onTileLayer()) {
+            mouseTile.x = Math.floor(mouseRoom.x / tilesetData.tileWidth);
+            mouseTile.y = Math.floor(mouseRoom.y / tilesetData.tileHeight);
+        }
     });
 
     rv.addEventListener("wheel", (e) => {
