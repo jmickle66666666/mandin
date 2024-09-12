@@ -301,7 +301,11 @@
     }
 
     let lastdrawpos = {x:-1, y:-1};
-    function paintTile(x, y, tile, size) {
+    function paintTile(x, y, tile) {
+        if (x >= Layers.currentLayer.tiles.SerialiseWidth) return;
+        if (x < 0) return;
+        if (y >= Layers.currentLayer.tiles.SerialiseHeight) return;
+        if (y < 0) return;
         let index = x + y * Layers.currentLayer.tiles.SerialiseWidth;
         index += 1;
         Layers.currentLayer.tiles["TileCompressedData"][index] = tile;
