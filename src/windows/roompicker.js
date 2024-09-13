@@ -89,9 +89,7 @@
         GMF.getRoomData(room, (data) => {
             console.log(data);
             Layers.buildList(data);
-            Room.loadRoom(data, (canvas) => {
-                log(canvas);
-            });
+            Room.loadRoom(data);
         });
     }
     RoomPicker.loadRoom = loadRoom;

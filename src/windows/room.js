@@ -181,6 +181,8 @@
             render();
         }
         moveView((outputCanvas.width - roomLayers[0].width)/2, (outputCanvas.height - roomLayers[0].height)/2);
+
+        document.querySelector("#btn_roomreload").addEventListener("click", reload);
     }
     Room.loadRoom = loadRoom;
 
@@ -216,6 +218,16 @@
     }
     Room.render = render;
 
+    function reload() {
+        let transform = outctx.getTransform();
+        GMF.getRoomData(roomData["%Name"], (data) => {
+            Layers.buildList(data);
+            Room.loadRoom(data);
+            outctx.setTransform(transform);
+            log("hi");
+        });
+    }
+
     function updateVisibility() {
         for (let i = 0; i < roomLayers.length; i++) {
             roomLayers[i].style.visibility = roomLayers[i].layer.visible?"visible":"hidden";
@@ -227,8 +239,8 @@
         if (open) return;
         open = true;
         let size = Settings.getWindowSize("room", 10, 10, 400, 300);
-        winbox = new WinBox("Room Viewer", {
-            mount: document.querySelector("div.wb#roomViewer"),
+        winbox = new WinBox("Room Editor", {
+            mount: document.querySelector("div.wb#roomEditor"),
             onclose: () => {
                 open = false;
             },
