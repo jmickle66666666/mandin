@@ -18,6 +18,10 @@ function loadProject(projectPath) {
     if (window.visualViewport.width != windowSize.w || window.visualViewport.height != windowSize.h) {
         Engine.setSize(Math.floor(windowSize.w), Math.floor(windowSize.h));
     }
+
+    Engine.setMaximized(Settings.loadValue("maximized", false));
+
+    Engine.setTitle("Mandin");
 }
 
 function projectSetup() {
@@ -54,14 +58,16 @@ window.onload = () => {
         document.querySelector("#btn_project_setup").addEventListener("click", projectSetup);
     });
 
-    Engine.setTitle("Mandin");
-
     window.addEventListener("resize", () => {
         Settings.saveWindowWH(
             "window",
             Math.floor(window.visualViewport.width),
             Math.floor(window.visualViewport.height)
         );
+
+        Engine.isMaximized((isMaximized) => {
+            Settings.saveValue("maximized", isMaximized);
+        });
     });
 
     window.addEventListener("contextmenu", (e) => {
