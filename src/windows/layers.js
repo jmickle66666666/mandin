@@ -67,6 +67,8 @@
                 if (layers[i]["$GMRTileLayer"] != null) {
                     TilePicker.loadTileset(layers[i].tilesetId.name);
                 }
+
+                Room.onLayerSwitch();
             }
 
             if (layers[i]["$GMRInstanceLayer"] != null) { option.insertBefore(Util.img("assets/instances.png"), option.firstChild); }

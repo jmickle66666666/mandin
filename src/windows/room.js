@@ -85,7 +85,13 @@
             for (let inst of instances) {
                 GMF.getObjectSprite(inst.objectId.name, (sprite_data) => {
                     Util.loadImage(sprite_data.img_path, (img) => {
-                        ctx.drawImage(img, inst.x - sprite_data.data.sequence.xorigin, inst.y - sprite_data.data.sequence.yorigin);
+                        ctx.drawImage(
+                            img, 
+                            inst.x - sprite_data.data.sequence.xorigin, 
+                            inst.y - sprite_data.data.sequence.yorigin,
+                            sprite_data.data.width * inst.scaleX,
+                            sprite_data.data.height * inst.scaleY
+                        );
                     })
                 });
             }
@@ -214,6 +220,34 @@
             }
         }
 
+        if (Layers.onInstanceLayer()) {
+            outctx.strokeStyle = "#00ff00aa";
+            let a = -beep + hrect.x + 0.5 - 1;
+            let b = - beep + hrect.y + 0.5 - 1;
+            let c = 1 + a + (hrect.w + beep*2);
+            let d = 1 + b + (hrect.h + beep*2);
+            // outctx.strokeRect(, , , );
+            outctx.beginPath();
+
+            outctx.moveTo(a, b + 2);
+            outctx.lineTo(a, b);
+            outctx.lineTo(a + 2, b);
+
+            outctx.moveTo(c, b + 2);
+            outctx.lineTo(c, b);
+            outctx.lineTo(c - 2, b);
+
+            outctx.moveTo(a, d - 2);
+            outctx.lineTo(a, d);
+            outctx.lineTo(a + 2, d);
+
+            outctx.moveTo(c, d - 2);
+            outctx.lineTo(c, d);
+            outctx.lineTo(c - 2, d);
+
+            outctx.stroke();
+        }
+
         requestAnimationFrame(render);
     }
     Room.render = render;
@@ -224,7 +258,6 @@
             Layers.buildList(data);
             Room.loadRoom(data);
             outctx.setTransform(transform);
-            log("hi");
         });
     }
 
@@ -343,6 +376,21 @@
         }
     }
 
+    function onLayerSwitch() {
+        instances = [];
+        if (Layers.onInstanceLayer()) {
+            for (let inst of Layers.currentLayer.instances) {
+                GMF.getObjectSprite(inst.objectId.name, (sprite_data) => {
+                    instances.push({
+                        instanceData: inst,
+                        spriteData: sprite_data.data
+                    });
+                });
+            }
+        }
+    }
+    Room.onLayerSwitch = onLayerSwitch;
+
     window.addEventListener("keydown", (e) => {
         if(e.ctrlKey && e.key == "s") {
             log("Saving room!");
@@ -433,13 +481,36 @@
         }
 
         if (Layers.onInstanceLayer()) {
-            for (let inst of Layers.currentLayer.instances) {
-                if (mouseRoom.x >= inst.x && mouseRoom.y >= inst.y && mouseRoom.x < inst.x + 16 && mouseRoom.y < inst.y + 16) {
-                    highlightRect(inst.x, inst.y, 8, 8);
+            for (let inst of instances) {
+                let x1 = inst.instanceData.x - inst.spriteData.sequence.xorigin;
+                let y1 = inst.instanceData.y - inst.spriteData.sequence.yorigin;
+                let x2 = x1 + inst.spriteData.width * inst.instanceData.scaleX;
+                let y2 = y1 + inst.spriteData.height * inst.instanceData.scaleY;
+                if (mouseRoom.x >= x1 && mouseRoom.y >= y1 && mouseRoom.x < x2 && mouseRoom.y < y2) {
+                    highlightRect(x1, y1, x2, y2);
+                    instanceHighlight = inst;
                 }
+            }
+
+            if (instanceHighlight != lastInstanceHighlight) {
+                beep = 1;
+                setTimeout(() => {beep = 0;}, 30);
+                lastInstanceHighlight = instanceHighlight;
             }
         }
     });
+    let instanceHighlight = null;
+    let lastInstanceHighlight = null;
+    let beep = 1;
+
+    let hrect = {x:0, y:0, w:0,h:0};
+    function highlightRect(x1, y1, x2, y2) 
+    {
+        hrect.x = x1;
+        hrect.y = y1;
+        hrect.w = x2-x1;
+        hrect.h = y2-y1;
+    }
 
     let mouseRoom = {x:0, y:0};
     let mouseTile = {x:0, y:0};
