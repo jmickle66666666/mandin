@@ -262,6 +262,28 @@
                 outctx.strokeStyle = "#ffbb00dd";
                 funRect(x1, y1, x2, y2);
             }
+
+            if (boxSelectStart != null) {
+                outctx.strokeStyle = "#ffffffdd";
+                let mx1 = Math.min(boxSelectStart.x, mouseRoom.x);
+                let mx2 = Math.max(boxSelectStart.x, mouseRoom.x);
+                let my1 = Math.min(boxSelectStart.y, mouseRoom.y);
+                let my2 = Math.max(boxSelectStart.y, mouseRoom.y);
+                funRect(mx1, my1, mx2, my2);
+
+                for (let inst of instances)
+                {
+                    let x1 = inst.instanceData.x - inst.spriteData.sequence.xorigin;
+                    let y1 = inst.instanceData.y - inst.spriteData.sequence.yorigin;
+                    let x2 = x1 + inst.spriteData.width * inst.instanceData.scaleX;
+                    let y2 = y1 + inst.spriteData.height * inst.instanceData.scaleY;
+
+                    if (mx1 < x2 && my1 < y2 && mx2 > x1 && my2 > y1) {
+                        outctx.strokeStyle = "#9922FFdd";
+                        funRect(x1, y1, x2, y2);
+                    }
+                }
+            }
         }
 
         requestAnimationFrame(render);
@@ -334,6 +356,7 @@
     let painting = false;
     let instancing = false;
     let deleting = false;
+    let boxSelectStart = null;
     rv.addEventListener("mousedown", (e) => {
         if (e.button == 1) {
             dragging = true;
@@ -372,6 +395,11 @@
                         if (instanceSelection.indexOf(instanceHighlight) == -1) {
                             instanceSelection.push(instanceHighlight);
                         }
+                    } else {
+                        boxSelectStart = {
+                            x: mouseRoom.x,
+                            y: mouseRoom.y
+                        };
                     }
                 }
             }
@@ -506,7 +534,7 @@
             },() => {
                 inst.instanceData.x = oldX;
                 inst.instanceData.y = oldY;
-                reRenderCurrentLayer();
+                reRenderLayers();
             });
         }
     }
@@ -582,6 +610,29 @@
                 registerDataUndo("create instances", instancingUndo);
             }
             instancing = false;
+
+            if (boxSelectStart != null) {
+                if (!e.shiftKey) instanceSelection = [];
+                for (let inst of instances)
+                {
+                    let x1 = inst.instanceData.x - inst.spriteData.sequence.xorigin;
+                    let y1 = inst.instanceData.y - inst.spriteData.sequence.yorigin;
+                    let x2 = x1 + inst.spriteData.width * inst.instanceData.scaleX;
+                    let y2 = y1 + inst.spriteData.height * inst.instanceData.scaleY;
+
+                    let mx1 = Math.min(boxSelectStart.x, mouseRoom.x);
+                    let mx2 = Math.max(boxSelectStart.x, mouseRoom.x);
+                    let my1 = Math.min(boxSelectStart.y, mouseRoom.y);
+                    let my2 = Math.max(boxSelectStart.y, mouseRoom.y);
+
+                    if (mx1 < x2 && my1 < y2 && mx2 > x1 && my2 > y1) {
+                        instanceSelection.push(inst);
+                    }
+                }
+
+                boxSelectStart = null;
+                instanceHighlight = null;
+            }
         }
 
         if (e.button == 2) {
@@ -626,7 +677,7 @@
             }
         }
 
-        if (deleting && Layers.onTileLayer()) {
+        if (deleting && Layers != null && Layers.onTileLayer()) {
             if (mouseTile.x != lastdrawpos.x || mouseTile.y != lastdrawpos.y) {
                 lastdrawpos.x = mouseTile.x;
                 lastdrawpos.y = mouseTile.y;
