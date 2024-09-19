@@ -24,8 +24,8 @@
         // let flipped = index & (1 << 29) != 0;
         // let rotated = index & (1 << 30) != 0;
         index &= 262143;
-        let ix = index % (src.width/tileWidth);
-        let iy = Math.floor(index / (src.width/tileWidth));
+        let ix = index % (src.naturalWidth/tileWidth);
+        let iy = Math.floor(index / (src.naturalWidth/tileWidth));
         let sx = ix * tileWidth;
         dest.drawImage(src, sx, iy * tileHeight, tileWidth, tileHeight, x * tileWidth, y * tileHeight, tileWidth, tileHeight);
     }
@@ -377,7 +377,7 @@
                             paintTile(x, y, newTile);
                         }, () => {
                             paintTile(x, y, oldTile);
-                        });
+                        }, true);
                     }
                 }
             }
