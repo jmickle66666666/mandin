@@ -73,11 +73,19 @@
     }
 
     function setHighlight(id) {
+        selectedObject = id;
         let elements = document.querySelectorAll("#objectpickerlist .listOption");
         for (var el of elements) {
             el.setAttribute("selected", el.id == id?"true":"false");
         }
     }
+
+    let selectedObject = "";
+
+    function getSelectedObject() {
+        return selectedObject;
+    }
+    ObjectPicker.getSelectedObject = getSelectedObject;
 
     document.querySelector("#objectpickerfilter").addEventListener("input", () => {
         buildList(cachedObjects, document.querySelector("#objectpickerfilter").value);

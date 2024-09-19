@@ -210,6 +210,7 @@
         if (lastTransform != null) outctx.setTransform(lastTransform);
 
         onLayerSwitch();
+        setMaxUniqueIndex();
         document.querySelector("#btn_roomreload").addEventListener("click", reload);
     }
     Room.loadRoom = loadRoom;
@@ -331,6 +332,7 @@
 
     let dragging = false;
     let painting = false;
+    let instancing = false;
     let deleting = false;
     rv.addEventListener("mousedown", (e) => {
         if (e.button == 1) {
@@ -358,10 +360,18 @@
             }
 
             if (Layers.onInstanceLayer()) {
-                if (!e.shiftKey) instanceSelection = [];
-                if (instanceHighlight != null) {
-                    if (instanceSelection.indexOf(instanceHighlight) == -1) {
-                        instanceSelection.push(instanceHighlight);
+                if (e.altKey) {
+                    instancingUndo = beginDataUndo();
+                    newInstance(ObjectPicker.getSelectedObject(), Layers.currentLayer, mouseTile.x, mouseTile.y);
+                    reRenderCurrentLayer();
+                    onLayerSwitch();
+                    instancing = true;
+                } else {
+                    if (!e.shiftKey) instanceSelection = [];
+                    if (instanceHighlight != null) {
+                        if (instanceSelection.indexOf(instanceHighlight) == -1) {
+                            instanceSelection.push(instanceHighlight);
+                        }
                     }
                 }
             }
@@ -499,6 +509,61 @@
                 reRenderCurrentLayer();
             });
         }
+    }
+
+    let uniqueIndex = 0;
+    function getUniqueName() {
+        let output = "mandin_" + uniqueIndex.toString(16);
+        uniqueIndex += 1;
+        return output;
+    }
+
+    function setMaxUniqueIndex() {
+        for (let i = 0; i < roomData.instanceCreationOrder.length; i++)
+        {
+            if (roomData.instanceCreationOrder[i].name.startsWith("mandin_")) {
+                let index = parseInt(roomData.instanceCreationOrder[i].name.split("_")[1], 16);
+                uniqueIndex = Math.max(uniqueIndex, index);
+            }
+        }
+    }
+
+    function newInstance(object, layer, x, y)
+    {
+        let instanceName = getUniqueName();
+        let output = 
+        {
+            "$GMRInstance": "v1",
+            "%Name": instanceName,
+            "colour": 4294967295,
+            "frozen": false,
+            "hasCreationCode": false,
+            "ignore": false,
+            "imageIndex": 0,
+            "imageSpeed": 1,
+            "inheritCode": false,
+            "inheritedItemId": null,
+            "inheritItemSettings": false,
+            "isDnd": false,
+            "name": instanceName,
+            "objectId": {
+              "name": object,
+              "path": `objects/${object}/${object}.yy`
+            },
+            "properties": [],
+            "resourceType": "GMRInstance",
+            "resourceVersion": "2.0",
+            "rotation": 0,
+            "scaleX": 1,
+            "scaleY": 1,
+            "x": x,
+            "y": y
+        };
+        layer.instances.push(output);
+        roomData.instanceCreationOrder.push({
+            name: instanceName,
+            path: `rooms/${roomData.name}/${roomData.name}.yy`
+        });
         
     }
 
@@ -512,6 +577,11 @@
                 Undo.compressSubstack("painting lots of tiles");
             }
             painting = false;
+
+            if (instancing) {
+                registerDataUndo("create instances", instancingUndo);
+            }
+            instancing = false;
         }
 
         if (e.button == 2) {
@@ -526,6 +596,8 @@
         let transform = outctx.getTransform();
         outctx.translate(x / transform.a, y / transform.d);
     }
+
+    let instancingUndo = null;
 
     window.addEventListener("mousemove", (e) => {
         if (dragging) {
@@ -576,24 +648,37 @@
         }
 
         if (Layers.onInstanceLayer()) {
+            
             instanceHighlight = null;
-            highlightRect(0,0,0,0);
-            for (let inst of instances) {
-                let x1 = inst.instanceData.x - inst.spriteData.sequence.xorigin;
-                let y1 = inst.instanceData.y - inst.spriteData.sequence.yorigin;
-                let x2 = x1 + inst.spriteData.width * inst.instanceData.scaleX;
-                let y2 = y1 + inst.spriteData.height * inst.instanceData.scaleY;
-                if (mouseRoom.x >= x1 && mouseRoom.y >= y1 && mouseRoom.x < x2 && mouseRoom.y < y2) {
-                    highlightRect(x1, y1, x2, y2);
-                    instanceHighlight = inst;
+            if (e.altKey) {
+                if (instancing && (lastdrawpos.x != mouseTile.x || lastdrawpos.y != mouseTile.y))
+                {
+                    lastdrawpos.x = mouseTile.x;
+                    lastdrawpos.y = mouseTile.y;
+                    newInstance(ObjectPicker.getSelectedObject(), Layers.currentLayer, mouseTile.x, mouseTile.y);
+                    reRenderCurrentLayer();
+                    onLayerSwitch();
+                }
+            } else {
+                highlightRect(0,0,0,0);
+                for (let inst of instances) {
+                    let x1 = inst.instanceData.x - inst.spriteData.sequence.xorigin;
+                    let y1 = inst.instanceData.y - inst.spriteData.sequence.yorigin;
+                    let x2 = x1 + inst.spriteData.width * inst.instanceData.scaleX;
+                    let y2 = y1 + inst.spriteData.height * inst.instanceData.scaleY;
+                    if (mouseRoom.x >= x1 && mouseRoom.y >= y1 && mouseRoom.x < x2 && mouseRoom.y < y2) {
+                        highlightRect(x1, y1, x2, y2);
+                        instanceHighlight = inst;
+                    }
+                }
+    
+                if (instanceHighlight != lastInstanceHighlight) {
+                    beep = 1;
+                    setTimeout(() => {beep = 0;}, 30);
+                    lastInstanceHighlight = instanceHighlight;
                 }
             }
 
-            if (instanceHighlight != lastInstanceHighlight) {
-                beep = 1;
-                setTimeout(() => {beep = 0;}, 30);
-                lastInstanceHighlight = instanceHighlight;
-            }
         }
     });
     let instanceHighlight = null;
@@ -618,6 +703,11 @@
         if (Layers.onTileLayer()) {
             mouseTile.x = Math.floor(mouseRoom.x / tilesetData.tileWidth);
             mouseTile.y = Math.floor(mouseRoom.y / tilesetData.tileHeight);
+        }
+
+        if (Layers.onInstanceLayer()) {
+            mouseTile.x = Math.floor(mouseRoom.x / Layers.currentLayer.gridX) * Layers.currentLayer.gridX;
+            mouseTile.y = Math.floor(mouseRoom.y / Layers.currentLayer.gridY) * Layers.currentLayer.gridY;
         }
     });
 
