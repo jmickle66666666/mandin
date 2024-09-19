@@ -60,13 +60,11 @@
                 setHighlight(objects[i]);
             }
 
-            setTimeout(() => {
-                GMF.getObjectSprite(objects[i], (sprite_data) => {
-                    Util.loadImage(sprite_data.img_path, (data) => {
-                        option.insertBefore(data, option.firstChild);
-                    })
-                });
-            }, 100 + Math.random() * 4 * objects.length);
+            GMF.getObjectSprite(objects[i], (sprite_data) => {
+                Util.loadImage(sprite_data.img_path, (data) => {
+                    option.insertBefore(data, option.firstChild);
+                })
+            });
 
             objectPicker.appendChild(option);
         }
