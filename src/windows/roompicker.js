@@ -88,7 +88,6 @@
         Settings.saveValue("lastLoadedRoom", room);
         GMF.getRoomData(room, (data) => {
             console.log(data);
-            Layers.buildList(data);
             Room.loadRoom(data);
         });
     }

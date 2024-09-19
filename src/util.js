@@ -1,11 +1,19 @@
 (function() {
     let Util = {};
 
-    Util.loadImage = function(path, callback) {
+    let imageCache = {};
+
+    Util.loadImage = function(path, callback, forceload=false) {
+        if (forceload == false && imageCache[path] != null) {
+            callback(imageCache[path]);
+            return;
+        }
+
         Engine.fileReadBytes(path, (data) => {
             let image = new Image();
             image.src = "data:image/png;base64,"+data;
             image.addEventListener("load", () => {
+                imageCache[path] = image;
                 callback(image);
             });
         });

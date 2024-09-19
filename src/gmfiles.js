@@ -10,6 +10,20 @@
     }
     GMF.yypParse = yypParse;
 
+    let textCache = {};
+    function cachedTextRead(path, callback)
+    {
+        if (textCache[path] != null) {
+            callback(textCache[path]);
+            return;
+        }
+
+        Engine.fileReadText(path, (data) => {
+            textCache[path] = data;
+            callback(data);
+        });
+    }
+
     function setProjectPath(_projectPath)
     {
         log("setting project path: "+_projectPath);
@@ -63,7 +77,7 @@
     function getAssetData(asset, callback) {
         path = getResourcePath(asset);
         if (path == null) {log("fucxked up! truna get "+asset); return;}
-        Engine.fileReadText(path, (data) => {
+        cachedTextRead(path, (data) => {
             callback(yypParse(data));
         });
     }
@@ -75,7 +89,7 @@
             let spriteDataPath = GMF.projectDirectory + data.spriteId.path;
             let spriteDirectoryPath = spriteDataPath.substring(0, spriteDataPath.lastIndexOf("/")+1);
             
-            Engine.fileReadText(GMF.projectDirectory + data.spriteId.path, (data) => {
+            cachedTextRead(GMF.projectDirectory + data.spriteId.path, (data) => {
                 data = yypParse(data);
                 callback({data:data, img_path: spriteDirectoryPath + data.frames[0].name + ".png"});
             });
@@ -95,12 +109,6 @@
         return GMF.projectDirectory + "rooms/" + room + "/" + room + ".yy";
     }
     GMF.getRoomDataPath = getRoomDataPath;
-
-    // function getTilesetSourceImage(tileset, callback) {
-    //     getAssetData(tileset, (data) => {
-
-    //     });
-    // }
 
     window.GMF = GMF;
     

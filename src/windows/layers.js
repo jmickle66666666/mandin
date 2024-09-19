@@ -41,9 +41,8 @@
     Layers.openWindow = openWindow;
 
     function buildList(roomData) {
-
-        console.log(roomData);
         let layers = roomData.layers;
+        Layers.currentLayer = null;
 
         openWindow();
         let layersElement = document.querySelector("#layerlist");

@@ -141,7 +141,27 @@
         }
     }
 
+    function reRenderCurrentLayer() {
+        for (let i = 0; i < roomLayers.length; i++) {
+            if (roomLayers[i].layer == Layers.currentLayer) {
+                drawLayer(roomLayers[i].getContext("2d"), Layers.currentLayer);
+            }
+        }
+    }
+
+    function reRenderLayers() {
+        for (let i = 0; i < roomLayers.length; i++) {
+            drawLayer(roomLayers[i].getContext("2d"), roomLayers[i].layer);
+        }
+    }
+
     function loadRoom(_roomData) {
+        let lastTransform = null;
+        if (outctx != null) {
+            lastTransform = outctx.getTransform();
+        }
+        Layers.buildList(_roomData);
+
         TilePicker.clear();
         dx = 0;
         dy = 0;
@@ -177,6 +197,7 @@
         outputCanvas.width = outputCanvas.parentElement.clientWidth;
         outputCanvas.height = outputCanvas.parentElement.clientHeight;
         outctx.imageSmoothingEnabled = false;
+        
         render();
 
         openWindow();
@@ -184,10 +205,11 @@
             outputCanvas.width = outputCanvas.parentElement.clientWidth;
             outputCanvas.height = outputCanvas.parentElement.clientHeight;
             outctx.imageSmoothingEnabled = false;
-            render();
         }
         moveView((outputCanvas.width - roomLayers[0].width)/2, (outputCanvas.height - roomLayers[0].height)/2);
+        if (lastTransform != null) outctx.setTransform(lastTransform);
 
+        onLayerSwitch();
         document.querySelector("#btn_roomreload").addEventListener("click", reload);
     }
     Room.loadRoom = loadRoom;
@@ -221,36 +243,52 @@
         }
 
         if (Layers.onInstanceLayer()) {
-            outctx.strokeStyle = "#00ff00aa";
-            let a = -beep + hrect.x + 0.5 - 1;
-            let b = - beep + hrect.y + 0.5 - 1;
-            let c = 1 + a + (hrect.w + beep*2);
-            let d = 1 + b + (hrect.h + beep*2);
-            // outctx.strokeRect(, , , );
-            outctx.beginPath();
+            if (instanceHighlight != null) {
+                outctx.strokeStyle = "#00ff00aa";
+                let a = -beep + hrect.x + 0.5 - 1;
+                let b = - beep + hrect.y + 0.5 - 1;
+                let c = 1 + a + (hrect.w + beep*2);
+                let d = 1 + b + (hrect.h + beep*2);
+                funRect(a,b,c,d);
+            }
 
-            outctx.moveTo(a, b + 2);
-            outctx.lineTo(a, b);
-            outctx.lineTo(a + 2, b);
-
-            outctx.moveTo(c, b + 2);
-            outctx.lineTo(c, b);
-            outctx.lineTo(c - 2, b);
-
-            outctx.moveTo(a, d - 2);
-            outctx.lineTo(a, d);
-            outctx.lineTo(a + 2, d);
-
-            outctx.moveTo(c, d - 2);
-            outctx.lineTo(c, d);
-            outctx.lineTo(c - 2, d);
-
-            outctx.stroke();
+            for (let i = 0; i < instanceSelection.length; i++) {
+                let inst = instanceSelection[i];
+                let x1 = 0.5 + inst.instanceData.x - inst.spriteData.sequence.xorigin;
+                let y1 = 0.5 + inst.instanceData.y - inst.spriteData.sequence.yorigin;
+                let x2 = -1 + x1 + inst.spriteData.width * inst.instanceData.scaleX;
+                let y2 = -1 + y1 + inst.spriteData.height * inst.instanceData.scaleY;
+                outctx.strokeStyle = "#ffbb00dd";
+                funRect(x1, y1, x2, y2);
+            }
         }
 
         requestAnimationFrame(render);
     }
     Room.render = render;
+    let instanceSelection = [];
+
+    function funRect(x1, y1, x2, y2) {
+        outctx.beginPath();
+
+        outctx.moveTo(x1, y1 + 2.5);
+        outctx.lineTo(x1, y1);
+        outctx.lineTo(x1 + 2.5, y1);
+
+        outctx.moveTo(x2, y1 + 2.5);
+        outctx.lineTo(x2, y1);
+        outctx.lineTo(x2 - 2.5, y1);
+
+        outctx.moveTo(x1, y2 - 2.5);
+        outctx.lineTo(x1, y2);
+        outctx.lineTo(x1 + 2.5, y2);
+
+        outctx.moveTo(x2, y2 - 2.5);
+        outctx.lineTo(x2, y2);
+        outctx.lineTo(x2 - 2.5, y2);
+
+        outctx.stroke();
+    }
 
     function reload() {
         let transform = outctx.getTransform();
@@ -292,7 +330,7 @@
     }
 
     let dragging = false;
-    let holding = false;
+    let painting = false;
     let deleting = false;
     rv.addEventListener("mousedown", (e) => {
         if (e.button == 1) {
@@ -300,9 +338,9 @@
         }
 
         if (e.button == 0) {
-            holding = true;
-            Undo.beginSubstack();
             if (Layers.onTileLayer()) {
+                painting = true;
+                Undo.beginSubstack();
                 let off = Math.floor(brushSize/2);
                 for (let i = 0; i < brushSize; i++) {
                     for (let j = 0; j < brushSize; j++) {
@@ -318,12 +356,21 @@
                     }
                 }
             }
+
+            if (Layers.onInstanceLayer()) {
+                if (!e.shiftKey) instanceSelection = [];
+                if (instanceHighlight != null) {
+                    if (instanceSelection.indexOf(instanceHighlight) == -1) {
+                        instanceSelection.push(instanceHighlight);
+                    }
+                }
+            }
         }
 
         if (e.button == 2) {
             deleting = true;
-            Undo.beginSubstack();
             if (Layers.onTileLayer()) {
+                Undo.beginSubstack();
                 let off = Math.floor(brushSize/2);
                 for (let i = 0; i < brushSize; i++) {
                     for (let j = 0; j < brushSize; j++) {
@@ -405,6 +452,29 @@
         if (e.key == "[") {
             if (brushSize > 1) brushSize -= 1;
         }
+
+        if (e.key == "Delete") {
+            if (Layers.onInstanceLayer() && instanceSelection.length > 0) {
+                let oldData = beginDataUndo();
+                for (let inst of instanceSelection) {
+                    let removeIndex = Layers.currentLayer.instances.indexOf(inst.instanceData);
+                    
+                    let removed = Layers.currentLayer.instances.splice(removeIndex, 1);
+                    
+                    for (let i = 0; i < roomData.instanceCreationOrder.length; i++) {
+                        if (roomData.instanceCreationOrder[i].name == removed.name) {
+                            removeIndex = i;
+                            break;
+                        }
+                    }
+                    roomData.instanceCreationOrder.splice(removeIndex, 1);
+                }
+                instanceSelection = [];
+                reRenderCurrentLayer();
+                onLayerSwitch();
+                registerDataUndo("Delete instances (dataundo)", oldData);
+            }
+        }
     })
 
     window.addEventListener("mouseup", (e) => {
@@ -413,10 +483,10 @@
         }
 
         if (e.button == 0) {
-            if (holding) {
+            if (painting) {
                 Undo.compressSubstack("painting lots of tiles");
             }
-            holding = false;
+            painting = false;
         }
 
         if (e.button == 2) {
@@ -437,7 +507,7 @@
             moveView(e.movementX, e.movementY);
         }
 
-        if (holding && Layers.onTileLayer()) {
+        if (painting && Layers.onTileLayer()) {
             if (mouseTile.x != lastdrawpos.x || mouseTile.y != lastdrawpos.y) {
                 lastdrawpos.x = mouseTile.x;
                 lastdrawpos.y = mouseTile.y;
@@ -481,6 +551,8 @@
         }
 
         if (Layers.onInstanceLayer()) {
+            instanceHighlight = null;
+            highlightRect(0,0,0,0);
             for (let inst of instances) {
                 let x1 = inst.instanceData.x - inst.spriteData.sequence.xorigin;
                 let y1 = inst.instanceData.y - inst.spriteData.sequence.yorigin;
@@ -537,6 +609,26 @@
             outctx.translate(-mouseRoom.x, -mouseRoom.y);
         }
     });
+
+    // expensive and should be phased out
+    function beginDataUndo()
+    {
+        return JSON.stringify(roomData);
+    }
+
+    function registerDataUndo(name, _oldData)
+    {
+        let oldData = _oldData;
+        let newData = JSON.stringify(roomData);
+        Undo.registerAction(name, () => {
+            roomData = JSON.parse(newData);
+            reRenderLayers();
+        }, function() {
+            roomData = JSON.parse(oldData);
+            loadRoom(roomData);
+            instances = [];
+        }, false);
+    }
 
     window.Room = Room;
 })();

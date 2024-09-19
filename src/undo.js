@@ -3,7 +3,7 @@
 
     let stack = [];
 
-    function registerAction(name, action, undo)
+    function registerAction(name, action, undo, execute = true)
     {
         stack.push({
             name: name,
@@ -11,7 +11,7 @@
             undo: undo
         });
 
-        action();
+        if (execute) action();
     }
     Undo.registerAction = registerAction;
 
