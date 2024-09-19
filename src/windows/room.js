@@ -453,8 +453,8 @@
             if (brushSize > 1) brushSize -= 1;
         }
 
-        if (e.key == "Delete") {
-            if (Layers.onInstanceLayer() && instanceSelection.length > 0) {
+        if (Layers.onInstanceLayer() && instanceSelection.length > 0) {
+            if (e.key == "Delete") {
                 let oldData = beginDataUndo();
                 for (let inst of instanceSelection) {
                     let removeIndex = Layers.currentLayer.instances.indexOf(inst.instanceData);
@@ -474,8 +474,33 @@
                 onLayerSwitch();
                 registerDataUndo("Delete instances (dataundo)", oldData);
             }
+
+            if (e.key == "ArrowLeft") { moveSelectedInstances(-Layers.currentLayer.gridX, 0); }
+            if (e.key == "ArrowRight") { moveSelectedInstances(Layers.currentLayer.gridX, 0); }
+            if (e.key == "ArrowUp") { moveSelectedInstances(0, -Layers.currentLayer.gridY); }
+            if (e.key == "ArrowDown") { moveSelectedInstances(0, Layers.currentLayer.gridY); }
         }
     })
+
+    function moveSelectedInstances(dx, dy)
+    {
+        for (let inst of instanceSelection) {
+            let oldX = inst.instanceData.x;
+            let oldY = inst.instanceData.y;
+            let newX = inst.instanceData.x + dx;
+            let newY = inst.instanceData.y + dy;
+            Undo.registerAction("move instances left", () => {
+                inst.instanceData.x = newX;
+                inst.instanceData.y = newY;
+                reRenderCurrentLayer();
+            },() => {
+                inst.instanceData.x = oldX;
+                inst.instanceData.y = oldY;
+                reRenderCurrentLayer();
+            });
+        }
+        
+    }
 
     window.addEventListener("mouseup", (e) => {
         if (e.button == 1) {
