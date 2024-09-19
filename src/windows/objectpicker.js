@@ -43,7 +43,6 @@
     function buildList(objects, filter) {
         let objectPicker = document.querySelector("#objectpickerlist");
         objectPicker.innerHTML = "";
-        log ("this many objects: "+objects.length);
         for (let i = 0; i < objects.length; i++) 
         {
             if (objects[i].indexOf(filter) == -1) continue;
