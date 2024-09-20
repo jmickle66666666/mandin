@@ -47,6 +47,7 @@
     TilePicker.openWindow = openWindow;
 
     function clear() {
+        TilePicker.currentTiles = [];
         document.querySelector("div.wb#tilePicker").innerHTML = "";
     }
     TilePicker.clear = clear;

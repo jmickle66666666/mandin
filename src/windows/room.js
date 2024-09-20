@@ -171,7 +171,6 @@
         }
         Layers.buildList(_roomData);
 
-        TilePicker.clear();
         dx = 0;
         dy = 0;
         roomData = _roomData;
@@ -243,7 +242,7 @@
             }
         }
 
-        if (Layers.onTileLayer()) {
+        if (Layers.onTileLayer() && tilesetData != null && tilesetImage != null) {
             let off = Math.floor(brushSize/2);
             for (let i = 0; i < brushSize; i++) {
                 for (let j = 0; j < brushSize; j++) {
@@ -786,7 +785,7 @@
         let t = outctx.getTransform().inverse();
         mouseRoom = t.transformPoint({x: e.offsetX, y:e.offsetY});
 
-        if (Layers.onTileLayer()) {
+        if (Layers.onTileLayer() && tilesetData != null) {
             mouseTile.x = Math.floor(mouseRoom.x / tilesetData.tileWidth);
             mouseTile.y = Math.floor(mouseRoom.y / tilesetData.tileHeight);
         }
