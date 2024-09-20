@@ -59,10 +59,10 @@
             option.innerText = layers[i]["%Name"];
             option.onclick = () => {
                 setHighlight(i);
-                TilePicker.clear();
-
+                Settings.saveValue("lastLayer", i);
                 Layers.currentLayer = layers[i];
 
+                TilePicker.clear();
                 if (layers[i]["$GMRTileLayer"] != null) {
                     TilePicker.loadTileset(layers[i].tilesetId.name);
                 }
@@ -84,6 +84,17 @@
             option.insertBefore(visibutton, option.firstChild);
 
             layersElement.appendChild(option);
+        }
+
+        let newid = Settings.loadValue("lastLayer", null);
+        if (newid != null) {
+            setHighlight(newid);
+            Layers.currentLayer = layers[newid];
+            TilePicker.clear();
+            if (Layers.currentLayer["$GMRTileLayer"] != null) {
+                TilePicker.loadTileset(Layers.currentLayer.tilesetId.name);
+            }
+            Room.onLayerSwitch();
         }
     }
     Layers.buildList = buildList;

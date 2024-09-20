@@ -17,6 +17,8 @@
     let instances = [];
     let winbox = null;
 
+    Room.getInstances = () => { return instances };
+
     function drawTile(src, dest, index, x, y, tileWidth, tileHeight)
     {
         // the transforms aren't working
@@ -825,7 +827,6 @@
         }, function() {
             roomData = JSON.parse(oldData);
             loadRoom(roomData);
-            instances = [];
         }, false);
     }
 
