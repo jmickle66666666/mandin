@@ -31,8 +31,13 @@
     }
 
     function drawLayer(ctx, layer) {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         if (layer["$GMRTileLayer"] != null) {
+            let tileArraySize = layer.tiles.SerialiseWidth * layer.tiles.SerialiseHeight;
+            if (tileArraySize == 0) {
+                console.log("SIZE IS ZERO WHY");
+                return;
+            }
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             let newTileArray = [layer.tiles.SerialiseWidth * layer.tiles.SerialiseHeight,];
             GMF.getAssetData(layer.tilesetId.name, (tileset_data) => {
                 tilesetData = tileset_data;
