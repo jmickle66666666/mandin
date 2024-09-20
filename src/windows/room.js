@@ -9,6 +9,7 @@
 
     let outputCanvas = null;
     let outctx = null;
+    let selectedInstancePreview = null;
 
     let rv = document.querySelector("div.wb#roomViewer");
 
@@ -85,9 +86,9 @@
             });
         }
 
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         if (layer["$GMRInstanceLayer"] != null) {
-            let instances = layer.instances;
-            for (let inst of instances) {
+            for (let inst of layer.instances) {
                 GMF.getObjectSprite(inst.objectId.name, (sprite_data) => {
                     Util.loadImage(sprite_data.img_path, (img) => {
                         ctx.drawImage(
@@ -289,6 +290,16 @@
                     }
                 }
             }
+
+            if (selectedInstancePreview != null && holdingAltToPreviewInstancePlacement) {
+                outctx.drawImage(
+                    selectedInstancePreview.img, 
+                    mouseTile.x - selectedInstancePreview.data.data.sequence.xorigin, 
+                    mouseTile.y - selectedInstancePreview.data.data.sequence.yorigin,
+                    selectedInstancePreview.data.data.width,
+                    selectedInstancePreview.data.data.height
+                );
+            }
         }
 
         requestAnimationFrame(render);
@@ -361,6 +372,7 @@
     let painting = false;
     let instancing = false;
     let deleting = false;
+    let holdingAltToPreviewInstancePlacement = false;
     let boxSelectStart = null;
     rv.addEventListener("mousedown", (e) => {
         if (e.button == 1) {
@@ -481,6 +493,11 @@
     }
     Room.onLayerSwitch = onLayerSwitch;
 
+    function setObjectPreview(img, sprite_data) {
+        selectedInstancePreview = { img:img, data:sprite_data };
+    }
+    Room.setObjectPreview = setObjectPreview;
+
     window.addEventListener("keydown", (e) => {
         if(e.ctrlKey && e.key == "s") {
             log("Saving room!");
@@ -523,7 +540,17 @@
             if (e.key == "ArrowUp") { moveSelectedInstances(0, -Layers.currentLayer.gridY); }
             if (e.key == "ArrowDown") { moveSelectedInstances(0, Layers.currentLayer.gridY); }
         }
+
+        if (Layers.onInstanceLayer() && e.key == "Alt") {
+            holdingAltToPreviewInstancePlacement = true;
+        }
     })
+
+    window.addEventListener("keyup", (e) => {
+        if (e.key == "Alt") {
+            holdingAltToPreviewInstancePlacement = false;
+        }
+    });
 
     function moveSelectedInstances(dx, dy)
     {

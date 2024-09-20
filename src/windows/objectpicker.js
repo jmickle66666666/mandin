@@ -71,6 +71,14 @@
 
     function setHighlight(id) {
         selectedObject = id;
+
+        // update room viewer preview
+        GMF.getObjectSprite(selectedObject, (sprite_data) => {
+            Util.loadImage(sprite_data.img_path, (img) => {
+                Room.setObjectPreview(img, sprite_data);
+            })
+        });
+
         let elements = document.querySelectorAll("#objectpickerlist .listOption");
         for (var el of elements) {
             el.setAttribute("selected", el.id == id?"true":"false");
