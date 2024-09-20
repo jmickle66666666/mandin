@@ -59,7 +59,7 @@
             option.innerText = layers[i]["%Name"];
             option.onclick = () => {
                 setHighlight(i);
-                Settings.saveValue("lastLayer", i);
+                Settings.saveValue("lastLayer", layers[i]["%Name"]);
                 Layers.currentLayer = layers[i];
 
                 TilePicker.clear();
@@ -86,15 +86,24 @@
             layersElement.appendChild(option);
         }
 
-        let newid = Settings.loadValue("lastLayer", null);
-        if (newid != null) {
-            setHighlight(newid);
-            Layers.currentLayer = layers[newid];
-            TilePicker.clear();
-            if (Layers.currentLayer["$GMRTileLayer"] != null) {
-                TilePicker.loadTileset(Layers.currentLayer.tilesetId.name);
+        let lastLayerName = Settings.loadValue("lastLayer", "");
+        if (lastLayerName != "") {
+            let newid = -1;
+            for (let i = 0; i < layers.length; i++) {
+                if (layers[i]["%Name"] == lastLayerName) {
+                    newid = i;
+                    break;
+                }
             }
-            Room.onLayerSwitch();
+            if (newid != -1) {
+                setHighlight(newid);
+                Layers.currentLayer = layers[newid];
+                TilePicker.clear();
+                if (Layers.currentLayer["$GMRTileLayer"] != null) {
+                    TilePicker.loadTileset(Layers.currentLayer.tilesetId.name);
+                }
+                Room.onLayerSwitch();
+            }
         }
     }
     Layers.buildList = buildList;
