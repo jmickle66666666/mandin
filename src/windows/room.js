@@ -34,7 +34,7 @@
         if (layer["$GMRTileLayer"] != null) {
             let tileArraySize = layer.tiles.SerialiseWidth * layer.tiles.SerialiseHeight;
             if (tileArraySize == 0) {
-                console.log("SIZE IS ZERO WHY");
+                log("SIZE IS ZERO WHY");
                 return;
             }
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
