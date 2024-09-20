@@ -86,8 +86,8 @@
             });
         }
 
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         if (layer["$GMRInstanceLayer"] != null) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             for (let inst of layer.instances) {
                 GMF.getObjectSprite(inst.objectId.name, (sprite_data) => {
                     Util.loadImage(sprite_data.img_path, (img) => {
@@ -104,6 +104,7 @@
         }
 
         if (layer["$GMRBackgroundLayer"] != null) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.fillStyle = Util.abgrToRGBA(layer.colour);
             ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         }
