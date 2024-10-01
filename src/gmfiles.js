@@ -27,6 +27,7 @@
     function setProjectPath(_projectPath)
     {
         log("setting project path: "+_projectPath);
+        _projectPath = _projectPath.replaceAll("\\", "/");
         GMF.projectPath = _projectPath;
 
         let lastSlash = GMF.projectPath.lastIndexOf("/");
