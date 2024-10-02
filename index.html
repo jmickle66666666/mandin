@@ -3,7 +3,7 @@
 </head>
 
 <div class="menubar">
-    <button id="btn_project_setup">PROJECT SETUP</button><button id="btn_rooms">ROOMS</button><button id="btn_objects">OBJECTS</button><button id="btn_log">LOG</button><button id="fill" style="flex-grow:1;">&nbsp;</button>
+    <button id="btn_project_setup">PROJECT SETUP</button><button id="btn_rooms">ROOMS</button><button id="btn_assets">ASSETS</button><button id="btn_log">LOG</button><button id="fill" style="flex-grow:1;">&nbsp;</button>
 </div>
 
 <body>
@@ -27,6 +27,9 @@
 
         <div class="wb picker" id="layers">
             <div id="layerlist" class="pickerlist"></div>
+        </div>
+
+        <div class="wb" id="assetwindow"></div>
         </div>
 
         <div class="wb" id="roomEditor">
@@ -53,6 +56,7 @@
 
     <script src="src/windows/log.js"></script>
     <script src="src/windows/room.js"></script>
+    <script src="src/windows/asset.js"></script>
     <script src="src/windows/tilepicker.js"></script>
     <script src="src/windows/objectpicker.js"></script>
     <script src="src/windows/roompicker.js"></script>

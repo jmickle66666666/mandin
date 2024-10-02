@@ -20,29 +20,9 @@
     let pickDrag = false;
     let pickDragStart = null;
 
-    let open = false;
     function openWindow() {
-        if (open) return;
-        open = true;
-
-        let size = Settings.getWindowSize("tilePicker", 60, 60, 100, 300);
-        winbox = new WinBox("Tile Picker", {
-            mount: document.querySelector("div.wb#tilePicker"),
-            onclose: () => {
-                open = false;
-            },
-            x:size.x,
-            y:size.y,
-            width:size.w,
-            height:size.h,
-            bottom:"2px",
-            onresize: (w, h) => {
-                Settings.saveWindowWH("tilePicker", w, h)
-            },
-            onmove: (x, y) => {
-                Settings.saveWindowXY("tilePicker", x, y)
-            }
-        });
+        AssetWindow.attach(document.querySelector("div.wb#tilePicker"));
+        return;
     }
     TilePicker.openWindow = openWindow;
 

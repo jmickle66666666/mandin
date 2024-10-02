@@ -66,6 +66,9 @@
                 if (layers[i]["$GMRTileLayer"] != null) {
                     TilePicker.loadTileset(layers[i].tilesetId.name);
                 }
+                if (Layers.currentLayer["$GMRInstanceLayer"] != null) {
+                    ObjectPicker.openWindow();
+                }
 
                 Room.onLayerSwitch();
             }
@@ -101,6 +104,9 @@
                 TilePicker.clear();
                 if (Layers.currentLayer["$GMRTileLayer"] != null) {
                     TilePicker.loadTileset(Layers.currentLayer.tilesetId.name);
+                }
+                if (Layers.currentLayer["$GMRInstanceLayer"] != null) {
+                    ObjectPicker.openWindow();
                 }
                 Room.onLayerSwitch();
             }
